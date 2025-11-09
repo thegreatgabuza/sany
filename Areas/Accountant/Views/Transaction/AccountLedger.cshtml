@@ -1,0 +1,761 @@
+@model List<Cascade.Fx9Kl2.Qw8Rt5Entity>
+
+@{
+    ViewData["Title"] = "Account Ledger";
+    var accountsByType = Model.GroupBy(a => a.Mx9Qw7Type).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => g.ToList());
+}
+
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+<div class="container-fluid px-4 py-6">
+    <!-- Header Section -->
+    <div class="row mb-6">
+        <div class="col-12">
+            <div class="bg-white rounded-2xl shadow-lg border-0 p-6">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-1">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-3 me-4 shadow-lg">
+                                <i class="fas fa-book fa-2x"></i>
+                            </div>
+                            <div>
+                                <h1 class="display-5 fw-bold text-dark mb-1 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Account Ledger</h1>
+                                <p class="text-muted mb-0 fs-6">Comprehensive view and management of your chart of accounts</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center text-sm text-muted">
+                            <i class="fas fa-calendar me-2 text-blue-500"></i>
+                            <span>Last updated: @DateTime.Now.ToString("MMM dd, yyyy 'at' hh:mm tt")</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a asp-action="Index" class="btn btn-light border-2 border-gray-200 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded-xl shadow-sm transition-all duration-200">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Transactions
+                        </a>
+                        <button type="button" class="btn bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0" data-bs-toggle="modal" data-bs-target="#exportModal">
+                            <i class="fas fa-download me-2"></i>Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-6">
+        @foreach (var accountType in new[] { "Asset", "Liability", "Equity", "Revenue", "Expense" })
+        {
+            var typeEnum = (Cascade.Fx9Kl2.Mx9Qw7Type)Enum.Parse(typeof(Cascade.Fx9Kl2.Mx9Qw7Type), accountType);
+            var count = accountsByType.ContainsKey(typeEnum) ? accountsByType[typeEnum].Count : 0;
+            var gradientClass = accountType switch {
+                "Asset" => "from-emerald-400 to-green-600",
+                "Liability" => "from-red-400 to-rose-600", 
+                "Equity" => "from-blue-400 to-indigo-600",
+                "Revenue" => "from-cyan-400 to-teal-600",
+                "Expense" => "from-amber-400 to-orange-600",
+                _ => "from-gray-400 to-gray-600"
+            };
+            var shadowColor = accountType switch {
+                "Asset" => "shadow-emerald-200",
+                "Liability" => "shadow-red-200", 
+                "Equity" => "shadow-blue-200",
+                "Revenue" => "shadow-cyan-200",
+                "Expense" => "shadow-amber-200",
+                _ => "shadow-gray-200"
+            };
+            
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card border-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden h-100 group">
+                    <div class="card-body text-center p-6 bg-gradient-to-br @gradientClass text-white position-relative">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                        <div class="position-relative z-1">
+                            <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-4 mb-4 mx-auto d-inline-flex align-items-center justify-center" style="width: 80px; height: 80px;">
+                                <i class="fas @(accountType switch {
+                                    "Asset" => "fa-coins",
+                                    "Liability" => "fa-credit-card", 
+                                    "Equity" => "fa-balance-scale",
+                                    "Revenue" => "fa-chart-line",
+                                    "Expense" => "fa-shopping-cart",
+                                    _ => "fa-folder"
+                                }) fa-2x text-white drop-shadow-lg"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2 display-6">@count</h3>
+                            <p class="mb-0 fw-medium opacity-90">@accountType Accounts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card border-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden h-100 group">
+                <div class="card-body text-center p-6 bg-gradient-to-br from-purple-500 to-violet-700 text-white position-relative">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                    <div class="position-relative z-1">
+                        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-4 mb-4 mx-auto d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-list-ul fa-2x text-white drop-shadow-lg"></i>
+                        </div>
+                        <h3 class="fw-bold mb-2 display-6">@Model.Count</h3>
+                        <p class="mb-0 fw-medium opacity-90">Total Accounts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-6">
+        <div class="col-12">
+            <div class="card border-0 rounded-2xl shadow-lg bg-white backdrop-blur-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center g-4">
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label fw-semibold text-gray-700 mb-2">
+                                <i class="fas fa-search text-blue-500 me-2"></i>Search Accounts
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 text-blue-600">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" id="searchAccounts" class="form-control border-2 border-blue-200 border-start-0 px-4 py-3 rounded-end-xl focus:border-blue-400 focus:shadow-lg transition-all duration-200" 
+                                       placeholder="Search by account name..." style="box-shadow: none; outline: none;">
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3">
+                            <label class="form-label fw-semibold text-gray-700 mb-2">
+                                <i class="fas fa-filter text-green-500 me-2"></i>Filter Type
+                            </label>
+                            <select id="filterAccountType" class="form-select border-2 border-green-200 rounded-xl px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 focus:border-green-400 focus:shadow-lg transition-all duration-200">
+                                <option value="">All Types</option>
+                                <option value="Asset">💰 Assets</option>
+                                <option value="Liability">💳 Liabilities</option>
+                                <option value="Equity">⚖️ Equity</option>
+                                <option value="Revenue">📈 Revenue</option>
+                                <option value="Expense">🛒 Expenses</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-3">
+                            <label class="form-label fw-semibold text-gray-700 mb-2">
+                                <i class="fas fa-sort text-purple-500 me-2"></i>Sort By
+                            </label>
+                            <select id="sortAccounts" class="form-select border-2 border-purple-200 rounded-xl px-4 py-3 bg-gradient-to-r from-purple-50 to-indigo-50 focus:border-purple-400 focus:shadow-lg transition-all duration-200">
+                                <option value="name-asc">📝 Name A-Z</option>
+                                <option value="name-desc">📝 Name Z-A</option>
+                                <option value="type-asc">🏷️ Type A-Z</option>
+                                <option value="type-desc">🏷️ Type Z-A</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4 col-md-12">
+                            <label class="form-label fw-semibold text-gray-700 mb-2">
+                                <i class="fas fa-eye text-indigo-500 me-2"></i>View Mode
+                            </label>
+                            <div class="d-flex gap-3 align-items-center">
+                                <div class="btn-group shadow-lg rounded-xl overflow-hidden border-2 border-indigo-200" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="tableView" checked>
+                                    <label class="btn btn-outline-indigo px-4 py-3 bg-gradient-to-r from-indigo-50 to-blue-50 border-0 text-indigo-600 hover:text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-blue-600 transition-all duration-300" for="tableView">
+                                        <i class="fas fa-table me-2"></i>Table View
+                                    </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="cardView">
+                                    <label class="btn btn-outline-indigo px-4 py-3 bg-gradient-to-r from-indigo-50 to-blue-50 border-0 text-indigo-600 hover:text-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-blue-600 transition-all duration-300" for="cardView">
+                                        <i class="fas fa-th-large me-2"></i>Card View
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accounts Display -->
+    @if (Model.Any())
+    {
+        <!-- Table View -->
+        <div id="tableViewContainer" class="card border-0 rounded-2xl shadow-xl overflow-hidden">
+            <div class="card-header bg-gradient-to-r from-slate-50 to-blue-50 border-bottom-0 py-4 px-6">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl p-2 me-3">
+                            <i class="fas fa-table"></i>
+                        </div>
+                        <h5 class="card-title mb-0 fw-bold text-gray-800">Chart of Accounts</h5>
+                    </div>
+                    <div class="badge bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 rounded-xl">
+                        @Model.Count Account@(Model.Count != 1 ? "s" : "")
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 modern-table" id="accountsTable">
+                        <thead class="bg-gradient-to-r from-gray-50 to-slate-100 sticky-top">
+                            <tr>
+                                <th class="border-0 ps-6 py-4 fw-semibold text-gray-700 text-uppercase tracking-wider">
+                                    <i class="fas fa-user me-2 text-blue-500"></i>Account Name
+                                </th>
+                                <th class="border-0 py-4 fw-semibold text-gray-700 text-uppercase tracking-wider">
+                                    <i class="fas fa-tag me-2 text-green-500"></i>Account Type
+                                </th>
+                                <th class="border-0 py-4 fw-semibold text-gray-700 text-uppercase tracking-wider">
+                                    <i class="fas fa-hashtag me-2 text-purple-500"></i>Account ID
+                                </th>
+                                <th class="border-0 text-center py-4 fw-semibold text-gray-700 text-uppercase tracking-wider">
+                                    <i class="fas fa-cogs me-2 text-orange-500"></i>Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var account in Model.OrderBy(a => a.Mx9Qw7Type).ThenBy(a => a.AccountName))
+                            {
+                                <tr class="account-row border-0 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-300 cursor-pointer" 
+                                    data-account-name="@account.AccountName.ToLower()" 
+                                    data-account-type="@account.Mx9Qw7Type">
+                                    <td class="ps-6 py-4 border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-gradient-to-br @(account.Mx9Qw7Type switch {
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "from-emerald-400 to-green-600",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "from-red-400 to-rose-600",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "from-blue-400 to-indigo-600",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "from-cyan-400 to-teal-600",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "from-amber-400 to-orange-600",
+                                                _ => "from-gray-400 to-gray-600"
+                                            }) text-white rounded-2xl me-4 d-flex align-items-center justify-content-center shadow-lg hover:shadow-xl transition-all duration-300" 
+                                                 style="width: 48px; height: 48px;">
+                                                <i class="fas @(account.Mx9Qw7Type switch {
+                                                    Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "fa-coins",
+                                                    Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "fa-credit-card",
+                                                    Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "fa-balance-scale",
+                                                    Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "fa-chart-line",
+                                                    Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "fa-shopping-cart",
+                                                    _ => "fa-folder"
+                                                }) fa-lg text-white drop-shadow-md"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h6 class="mb-1 fw-bold text-gray-900 text-lg">@account.AccountName</h6>
+                                                <p class="text-sm text-gray-500 mb-0 fw-medium">Financial Account</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 border-0">
+                                        <div class="d-inline-flex align-items-center">
+                                            <span class="badge bg-gradient-to-r @(account.Mx9Qw7Type switch {
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "from-emerald-100 to-green-200 text-emerald-800",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "from-red-100 to-rose-200 text-red-800",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "from-blue-100 to-indigo-200 text-blue-800",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "from-cyan-100 to-teal-200 text-cyan-800",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "from-amber-100 to-orange-200 text-amber-800",
+                                                _ => "from-gray-100 to-gray-200 text-gray-800"
+                                            }) px-4 py-2 fw-semibold rounded-xl shadow-sm border-2 @(account.Mx9Qw7Type switch {
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "border-emerald-200",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "border-red-200",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "border-blue-200",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "border-cyan-200",
+                                                Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "border-amber-200",
+                                                _ => "border-gray-200"
+                                            })">
+                                                @account.Mx9Qw7Type
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-gradient-to-r from-gray-50 to-slate-100 rounded-xl px-3 py-2 border-2 border-gray-200">
+                                                <code class="text-gray-700 fw-bold">#@account.AccountId.ToString("D4")</code>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center py-4 border-0">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <button type="button" class="btn btn-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300" 
+                                                    onclick="viewAccountTransactions(@account.AccountId, '@account.AccountName')"
+                                                    title="View Transactions">
+                                                <i class="fas fa-eye me-2"></i>View
+                                            </button>
+                                            <button type="button" class="btn btn-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300" 
+                                                    onclick="exportAccountLedger(@account.AccountId, '@account.AccountName')"
+                                                    title="Export Ledger">
+                                                <i class="fas fa-download me-2"></i>Export
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card View -->
+        <div id="cardViewContainer" class="d-none">
+            <div class="row" id="accountsCardContainer">
+                @foreach (var account in Model.OrderBy(a => a.Mx9Qw7Type).ThenBy(a => a.AccountName))
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-4 account-card" 
+                         data-account-name="@account.AccountName.ToLower()" 
+                         data-account-type="@account.Mx9Qw7Type">
+                        <div class="card border-0 shadow-sm h-100 hover-card">
+                            <div class="card-body text-center p-4">
+                                <div class="@(account.Mx9Qw7Type switch {
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "bg-success",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "bg-danger",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "bg-primary",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "bg-info",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "bg-warning",
+                                    _ => "bg-secondary"
+                                }) text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas @(account.Mx9Qw7Type switch {
+                                        Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "fa-coins",
+                                        Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "fa-credit-card",
+                                        Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "fa-balance-scale",
+                                        Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "fa-chart-line",
+                                        Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "fa-shopping-cart",
+                                        _ => "fa-folder"
+                                    }) fa-lg"></i>
+                                </div>
+                                <h6 class="card-title fw-semibold mb-2">@account.AccountName</h6>
+                                <span class="badge @(account.Mx9Qw7Type switch {
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Asset => "bg-success-subtle text-success",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Liability => "bg-danger-subtle text-danger",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Equity => "bg-primary-subtle text-primary",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Revenue => "bg-info-subtle text-info",
+                                    Cascade.Fx9Kl2.Mx9Qw7Type.Expense => "bg-warning-subtle text-warning",
+                                    _ => "bg-secondary-subtle text-secondary"
+                                }) mb-3">@account.Mx9Qw7Type</span>
+                                <p class="text-muted small mb-3">Account ID: #@account.AccountId.ToString("D4")</p>
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" 
+                                            onclick="viewAccountTransactions(@account.AccountId, '@account.AccountName')">
+                                        <i class="fas fa-eye me-1"></i>View Transactions
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success btn-sm" 
+                                            onclick="exportAccountLedger(@account.AccountId, '@account.AccountName')">
+                                        <i class="fas fa-download me-1"></i>Export Ledger
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 rounded-2xl shadow-xl overflow-hidden">
+            <div class="card-body text-center py-12 bg-gradient-to-br from-slate-50 to-blue-50">
+                <div class="mb-6">
+                    <div class="bg-gradient-to-r from-gray-200 to-slate-300 text-gray-600 rounded-full mx-auto mb-4 d-inline-flex align-items-center justify-content-center shadow-lg" style="width: 120px; height: 120px;">
+                        <i class="fas fa-inbox" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-800 mb-4 fw-bold">No accounts found</h3>
+                <p class="text-gray-600 mb-6 fs-5">There are no accounts in your chart of accounts yet. Create your first account to get started.</p>
+                <a asp-action="Create" asp-controller="Account" class="btn bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 fw-semibold">
+                    <i class="fas fa-plus me-3"></i>Add Your First Account
+                </a>
+            </div>
+        </div>
+    }
+</div>
+</div>
+
+<!-- Account Transactions Modal -->
+<div class="modal fade" id="accountTransactionsModal" tabindex="-1" aria-labelledby="accountTransactionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light border-0">
+                <h5 class="modal-title fw-semibold" id="accountTransactionsModalLabel">
+                    <i class="fas fa-list-alt text-primary me-2"></i>Account Transactions
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="accountTransactionsContent">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted mt-3 mb-0">Loading transaction history...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light border-0">
+                <h5 class="modal-title fw-semibold" id="exportModalLabel">
+                    <i class="fas fa-download text-success me-2"></i>Export Options
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Export Format:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exportFormat" id="exportExcel" value="excel" checked>
+                        <label class="form-check-label" for="exportExcel">
+                            <i class="fas fa-file-excel text-success me-2"></i>Excel Spreadsheet (.xlsx)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exportFormat" id="exportPdf" value="pdf">
+                        <label class="form-check-label" for="exportPdf">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>PDF Document (.pdf)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exportFormat" id="exportCsv" value="csv">
+                        <label class="form-check-label" for="exportCsv">
+                            <i class="fas fa-file-csv text-info me-2"></i>CSV File (.csv)
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Include:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="includeTransactions" checked>
+                        <label class="form-check-label" for="includeTransactions">
+                            Transaction History
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="includeBalances" checked>
+                        <label class="form-check-label" for="includeBalances">
+                            Account Balances
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="performExport()">
+                    <i class="fas fa-download me-2"></i>Export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchAccounts').on('input', function() {
+                filterAccounts();
+            });
+            
+            // Filter functionality
+            $('#filterAccountType').on('change', function() {
+                filterAccounts();
+            });
+            
+            // Sort functionality
+            $('#sortAccounts').on('change', function() {
+                sortAccounts();
+            });
+            
+            // View mode toggle
+            $('input[name="viewMode"]').on('change', function() {
+                toggleViewMode();
+            });
+        });
+
+        function filterAccounts() {
+            const searchTerm = $('#searchAccounts').val().toLowerCase();
+            const selectedType = $('#filterAccountType').val();
+            
+            $('.account-row, .account-card').each(function() {
+                const accountName = $(this).data('account-name');
+                const accountType = $(this).data('account-type');
+                
+                const matchesSearch = accountName.includes(searchTerm);
+                const matchesType = !selectedType || accountType === selectedType;
+                
+                if (matchesSearch && matchesType) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        function sortAccounts() {
+            const sortValue = $('#sortAccounts').val();
+            const isTableView = $('#tableView').is(':checked');
+            
+            if (isTableView) {
+                sortTableRows(sortValue);
+            } else {
+                sortCardItems(sortValue);
+            }
+        }
+
+        function sortTableRows(sortValue) {
+            const tbody = $('#accountsTable tbody');
+            const rows = tbody.find('tr.account-row').get();
+            
+            rows.sort(function(a, b) {
+                let aVal, bVal;
+                
+                if (sortValue.startsWith('name')) {
+                    aVal = $(a).find('h6').text().toLowerCase();
+                    bVal = $(b).find('h6').text().toLowerCase();
+                } else {
+                    aVal = $(a).data('account-type');
+                    bVal = $(b).data('account-type');
+                }
+                
+                if (sortValue.endsWith('desc')) {
+                    return aVal < bVal ? 1 : -1;
+                } else {
+                    return aVal > bVal ? 1 : -1;
+                }
+            });
+            
+            $.each(rows, function(index, row) {
+                tbody.append(row);
+            });
+        }
+
+        function sortCardItems(sortValue) {
+            const container = $('#accountsCardContainer');
+            const cards = container.find('.account-card').get();
+            
+            cards.sort(function(a, b) {
+                let aVal, bVal;
+                
+                if (sortValue.startsWith('name')) {
+                    aVal = $(a).find('.card-title').text().toLowerCase();
+                    bVal = $(b).find('.card-title').text().toLowerCase();
+                } else {
+                    aVal = $(a).data('account-type');
+                    bVal = $(b).data('account-type');
+                }
+                
+                if (sortValue.endsWith('desc')) {
+                    return aVal < bVal ? 1 : -1;
+                } else {
+                    return aVal > bVal ? 1 : -1;
+                }
+            });
+            
+            $.each(cards, function(index, card) {
+                container.append(card);
+            });
+        }
+
+        function toggleViewMode() {
+            if ($('#tableView').is(':checked')) {
+                $('#tableViewContainer').removeClass('d-none');
+                $('#cardViewContainer').addClass('d-none');
+            } else {
+                $('#tableViewContainer').addClass('d-none');
+                $('#cardViewContainer').removeClass('d-none');
+            }
+        }
+
+        function viewAccountTransactions(accountId, accountName) {
+            $('#accountTransactionsModalLabel').html('<i class="fas fa-list-alt text-primary me-2"></i>Transactions for ' + accountName);
+            $('#accountTransactionsModal').modal('show');
+            
+            // Reset content with loading state
+            $('#accountTransactionsContent').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">Loading transaction history for ${accountName}...</p>
+                </div>
+            `);
+            
+            // Load transactions for this account
+            $.get('@Url.Action("GetAccountTransactions", "Transaction", new { area = "Accountant" })', 
+                { accountId: accountId })
+                .done(function(data) {
+                    $('#accountTransactionsContent').html(data);
+                })
+                .fail(function() {
+                    $('#accountTransactionsContent').html(`
+                        <div class="alert alert-danger m-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Error loading transactions.</strong> 
+                            Please check your connection and try again.
+                        </div>
+                    `);
+                });
+        }
+
+        function exportAccountLedger(accountId, accountName) {
+            // This would typically make an AJAX call to export the specific account
+            alert(`Export feature for ${accountName} will be implemented. Account ID: ${accountId}`);
+        }
+
+        function performExport() {
+            const format = $('input[name="exportFormat"]:checked').val();
+            const includeTransactions = $('#includeTransactions').is(':checked');
+            const includeBalances = $('#includeBalances').is(':checked');
+            
+            // This would typically make an AJAX call to the server
+            alert(`Exporting chart of accounts as ${format.toUpperCase()}...\nInclude Transactions: ${includeTransactions}\nInclude Balances: ${includeBalances}`);
+            
+            $('#exportModal').modal('hide');
+        }
+    </script>
+    
+    <style>
+        /* Modern Card Hover Effects */
+        .hover-card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        /* Modern Table Styling */
+        .modern-table {
+            border-spacing: 0;
+        }
+        
+        .modern-table .account-row {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .modern-table .account-row:hover {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%) !important;
+            border-left-color: #3b82f6;
+            transform: translateX(4px);
+        }
+        
+        /* Gradient Text Effect */
+        .bg-clip-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Custom Button Hover Effects */
+        .btn {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Input Focus Effects */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+        
+        /* Backdrop Blur Effect */
+        .backdrop-blur-sm {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        /* Card Animation */
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        /* Badge Animation */
+        .badge {
+            transition: all 0.3s ease;
+        }
+        
+        .badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Sticky Header */
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        /* Modern Scrollbar */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+        }
+        
+        /* Utility Classes */
+        .text-transparent { color: transparent; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .drop-shadow-lg { filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1)); }
+        .drop-shadow-md { filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06)); }
+        
+        /* Animation Keyframes */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        /* Loading Animation */
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Custom Button Variants */
+        .btn-outline-indigo {
+            color: #6366f1;
+            border-color: #6366f1;
+        }
+        
+        .btn-outline-indigo:hover {
+            color: white;
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+        
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+}

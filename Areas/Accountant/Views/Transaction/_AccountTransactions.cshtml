@@ -1,0 +1,311 @@
+@model List<Cascade.Fx9Kl2.Sx2Dn8Gateway>
+
+@{
+    decimal runningBalance = 0;
+    var totalDebit = Model.Sum(l => l.Debit);
+    var totalCredit = Model.Sum(l => l.Credit);
+    var finalBalance = totalDebit - totalCredit;
+}
+
+@if (Model.Any())
+{
+
+    <!-- Account Summary Cards -->
+    <div class="row mb-4 px-4 pt-3">
+        <div class="col-md-3">
+            <div class="card border-0 bg-success-subtle">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-plus-circle text-success mb-2" style="font-size: 1.5rem;"></i>
+                    <h6 class="text-success mb-1">Total Debits</h6>
+                    <h5 class="text-success mb-0 fw-bold">@totalDebit.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-danger-subtle">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-minus-circle text-danger mb-2" style="font-size: 1.5rem;"></i>
+                    <h6 class="text-danger mb-1">Total Credits</h6>
+                    <h5 class="text-danger mb-0 fw-bold">@totalCredit.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 @(finalBalance >= 0 ? "bg-primary-subtle" : "bg-warning-subtle")">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-balance-scale @(finalBalance >= 0 ? "text-primary" : "text-warning") mb-2" style="font-size: 1.5rem;"></i>
+                    <h6 class="@(finalBalance >= 0 ? "text-primary" : "text-warning") mb-1">Net Balance</h6>
+                    <h5 class="@(finalBalance >= 0 ? "text-primary" : "text-warning") mb-0 fw-bold">@finalBalance.ToString("C")</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-info-subtle">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-list text-info mb-2" style="font-size: 1.5rem;"></i>
+                    <h6 class="text-info mb-1">Total Transactions</h6>
+                    <h5 class="text-info mb-0 fw-bold">@Model.Count</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Filter and Search -->
+    <div class="px-4 mb-3">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" id="searchTransactions" class="form-control" 
+                           placeholder="Search transactions...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="sortTransactions" class="form-select form-select-sm">
+                    <option value="date-desc">Latest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="amount-desc">Highest Amount</option>
+                    <option value="amount-asc">Lowest Amount</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select id="filterType" class="form-select form-select-sm">
+                    <option value="">All Types</option>
+                    <option value="debit">Debits Only</option>
+                    <option value="credit">Credits Only</option>
+                </select>
+            </div>
+            <div class="col-md-3 text-end">
+                <button class="btn btn-sm btn-outline-success" onclick="exportTransactions()">
+                    <i class="fas fa-download me-1"></i>Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="table-responsive">
+        <table class="table table-hover mb-0" id="transactionsTable">
+            <thead class="table-dark">
+                <tr>
+                    <th class="border-0 ps-4">Date</th>
+                    <th class="border-0">Description</th>
+                    <th class="border-0">Reference</th>
+                    <th class="border-0 text-end">Debit</th>
+                    <th class="border-0 text-end">Credit</th>
+                    <th class="border-0 text-end">Balance</th>
+                    <th class="border-0 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    runningBalance = 0;
+                }
+                @foreach (var line in Model.OrderByDescending(l => l.Pz7Vm5Protocol!.TransactionDate).ThenByDescending(l => l.Pz7Vm5Protocol!.TransactionId))
+                {
+                    runningBalance += line.Debit - line.Credit;
+                    <tr class="transaction-row" 
+                        data-description="@line.Pz7Vm5Protocol!.Description.ToLower()"
+                        data-reference="@(line.Pz7Vm5Protocol!.ReferenceNo?.ToLower() ?? "")"
+                        data-date="@line.Pz7Vm5Protocol!.TransactionDate.ToString("yyyy-MM-dd")"
+                        data-amount="@Math.Max(line.Debit, line.Credit)"
+                        data-type="@(line.Debit > 0 ? "debit" : "credit")">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="@(line.Debit > 0 ? "bg-success" : "bg-danger") rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                                     style="width: 28px; height: 28px;">
+                                    <i class="fas @(line.Debit > 0 ? "fa-plus" : "fa-minus") text-white" style="font-size: 10px;"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">@line.Pz7Vm5Protocol!.TransactionDate.ToString("MMM dd, yyyy")</div>
+                                    <small class="text-muted">@line.Pz7Vm5Protocol!.TransactionDate.ToString("dddd")</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">@line.Pz7Vm5Protocol!.Description</div>
+                            @if (line.Pz7Vm5Protocol!.IsCorrection || line.Pz7Vm5Protocol!.IsReversal)
+                            {
+                                <div class="mt-1">
+                                    @if (line.Pz7Vm5Protocol!.IsCorrection)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">
+                                            <i class="fas fa-edit me-1"></i>Correction
+                                        </span>
+                                    }
+                                    @if (line.Pz7Vm5Protocol!.IsReversal)
+                                    {
+                                        <span class="badge bg-info-subtle text-info">
+                                            <i class="fas fa-undo me-1"></i>Reversal
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(line.Pz7Vm5Protocol!.ReferenceNo))
+                            {
+                                <code class="bg-light px-2 py-1 rounded">@line.Pz7Vm5Protocol!.ReferenceNo</code>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (line.Debit > 0)
+                            {
+                                <div class="fw-bold text-success">@line.Debit.ToString("C")</div>
+                                <small class="text-muted">DR</small>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (line.Credit > 0)
+                            {
+                                <div class="fw-bold text-danger">@line.Credit.ToString("C")</div>
+                                <small class="text-muted">CR</small>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <div class="fw-bold @(runningBalance >= 0 ? "text-success" : "text-danger")">
+                                @runningBalance.ToString("C")
+                            </div>
+                            <small class="text-muted">Balance</small>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="@Url.Action("Details", "Transaction", new { area = "Accountant", id = line.Pz7Vm5Protocol!.TransactionId })" 
+                                   class="btn btn-sm btn-outline-primary" title="View Details" target="_blank">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @if (!line.Pz7Vm5Protocol!.IsCorrection && !line.Pz7Vm5Protocol!.IsReversal)
+                                {
+                                    <a href="@Url.Action("Create", "Transaction", new { area = "Accountant", correctingTransactionId = line.Pz7Vm5Protocol!.TransactionId })" 
+                                       class="btn btn-sm btn-outline-warning" title="Create Correction" target="_blank">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary Footer -->
+    <div class="bg-light border-top px-4 py-3">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <small class="text-muted d-block">TOTAL DEBITS</small>
+                <strong class="text-success">@totalDebit.ToString("C")</strong>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">TOTAL CREDITS</small>
+                <strong class="text-danger">@totalCredit.ToString("C")</strong>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">NET BALANCE</small>
+                <strong class="@(finalBalance >= 0 ? "text-success" : "text-danger")">@finalBalance.ToString("C")</strong>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">TRANSACTIONS</small>
+                <strong class="text-dark">@Model.Count</strong>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5 px-4">
+        <div class="mb-4">
+            <i class="fas fa-receipt text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h5 class="text-muted mb-3">No transactions found</h5>
+        <p class="text-muted mb-4">This account has no transaction history yet.</p>
+        <a asp-action="Create" asp-controller="Transaction" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Create First Transaction
+        </a>
+    </div>
+}
+
+<script>
+$(document).ready(function() {
+    // Search functionality
+    $('#searchTransactions').on('input', function() {
+        filterTransactions();
+    });
+    
+    // Sort functionality
+    $('#sortTransactions').on('change', function() {
+        sortTransactions();
+    });
+    
+    // Filter by type
+    $('#filterType').on('change', function() {
+        filterTransactions();
+    });
+});
+
+function filterTransactions() {
+    const searchTerm = $('#searchTransactions').val().toLowerCase();
+    const filterType = $('#filterType').val();
+    
+    $('.transaction-row').each(function() {
+        const description = $(this).data('description');
+        const reference = $(this).data('reference');
+        const type = $(this).data('type');
+        
+        const matchesSearch = description.includes(searchTerm) || reference.includes(searchTerm);
+        const matchesType = !filterType || type === filterType;
+        
+        if (matchesSearch && matchesType) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+}
+
+function sortTransactions() {
+    const sortValue = $('#sortTransactions').val();
+    const tbody = $('#transactionsTable tbody');
+    const rows = tbody.find('tr.transaction-row').get();
+    
+    rows.sort(function(a, b) {
+        let aVal, bVal;
+        
+        if (sortValue.startsWith('date')) {
+            aVal = new Date($(a).data('date'));
+            bVal = new Date($(b).data('date'));
+        } else {
+            aVal = parseFloat($(a).data('amount'));
+            bVal = parseFloat($(b).data('amount'));
+        }
+        
+        if (sortValue.endsWith('desc')) {
+            return aVal < bVal ? 1 : -1;
+        } else {
+            return aVal > bVal ? 1 : -1;
+        }
+    });
+    
+    $.each(rows, function(index, row) {
+        tbody.append(row);
+    });
+}
+
+function exportTransactions() {
+    alert('Export transactions functionality will be implemented');
+}
+</script>
