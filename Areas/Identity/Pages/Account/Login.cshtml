@@ -1,0 +1,109 @@
+@page
+@using Cascade.Areas.Identity.Pages.Account
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<!-- Modern Login Container -->
+<div class="max-w-8xl mx-auto py-2">
+    <div class="flex items-center justify-center">
+        <!-- Login Card -->
+        <div class="w-full max-w-md">
+            <!-- Clean Card with Dashboard Styling -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+                <!-- Content -->
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <!-- Modern Logo -->
+                    <div class="w-16 h-16 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-sign-in-alt text-white text-2xl"></i>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h1 class="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+                    <p class="text-slate-600 text-sm">Sign in to your Qw8Rt5Entity</p>
+                </div>
+
+                <!-- Form -->
+                <form id="Qw8Rt5Entity" method="post" class="space-y-6">
+                    @Html.AntiForgeryToken()
+                    <!-- Validation Summary -->
+                    <div asp-validation-summary="ModelOnly" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm" role="alert"></div>
+                    
+                    <!-- Email Field -->
+                    <div class="space-y-2">
+                        <label asp-for="Input.Email" class="block text-sm font-medium text-slate-700">
+                            Email Address
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-slate-400"></i>
+                            </div>
+                            <input asp-for="Input.Email" 
+                                   class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-cascadeBlue focus:ring-2 focus:ring-cascadeBlue/20 focus:outline-none transition-all duration-300" 
+                                   autocomplete="username" 
+                                   aria-required="true"
+                                   placeholder="name@example.com" />
+                        </div>
+                        <span asp-validation-for="Input.Email" class="text-red-500 text-xs"></span>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label asp-for="Input.Password" class="block text-sm font-medium text-slate-700">
+                                Password
+                            </label>
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="text-xs text-cascadeBlue hover:text-cascadeBlue/80 transition-colors duration-300">
+                                Forgot password?
+                            </a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-slate-400"></i>
+                            </div>
+                            <input asp-for="Input.Password" 
+                                   class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-cascadeBlue focus:ring-2 focus:ring-cascadeBlue/20 focus:outline-none transition-all duration-300" 
+                                   autocomplete="current-password" 
+                                   aria-required="true"
+                                   placeholder="��������" />
+                        </div>
+                        <span asp-validation-for="Input.Password" class="text-red-500 text-xs"></span>
+                    </div>
+                    
+                    <!-- Remember Me -->
+                    <div class="flex items-center">
+                        <input class="h-4 w-4 text-cascadeBlue focus:ring-cascadeBlue bg-white border-slate-300 rounded"
+                               asp-for="Input.RememberMe" />
+                        <label asp-for="Input.RememberMe" class="ml-2 block text-sm text-slate-600">
+                            Remember me
+                        </label>
+                    </div>
+                    
+                    <!-- Sign In Button -->
+                    <button id="login-submit" type="submit"
+                            class="w-full py-3 px-4 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white font-medium rounded-xl shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cascadeBlue/20">
+                        <span class="flex items-center justify-center">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            Sign In
+                        </span>
+                    </button>
+                </form>
+                
+                <!-- Additional Links -->
+                <div class="text-center mt-6">
+                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" 
+                       class="text-xs text-cascadeBlue hover:text-cascadeBlue/80 transition-colors duration-300">
+                        Resend email confirmation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

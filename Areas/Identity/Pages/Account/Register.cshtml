@@ -1,0 +1,77 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Registration Disabled";
+}
+
+<!-- Registration Disabled Container -->
+<div class="max-w-8xl mx-auto py-2">
+    <div class="flex items-center justify-center">
+        <!-- Info Card -->
+        <div class="w-full max-w-md">
+            <!-- Clean Card with Dashboard Styling -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <!-- Modern Logo -->
+                    <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-lock text-white text-2xl"></i>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h1 class="text-2xl font-bold text-slate-900 mb-2">Registration Disabled</h1>
+                    <p class="text-slate-600 text-sm">Aq3Zh4Service accounts are managed by administrators</p>
+                </div>
+
+                <!-- Info Content -->
+                <div class="space-y-6">
+                    <!-- Info Message -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-500 text-lg mt-0.5"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">How to get access</h3>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <p>Aq3Zh4Service accounts are created by system administrators. Contact your organization's admin to request access to Cascade.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Qw8Rt5Entity Types Info -->
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-medium text-slate-700">Qw8Rt5Entity Types:</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
+                                <i class="fas fa-Aq3Zh4Service-shield text-blue-600 mr-3"></i>
+                                <div>
+                                    <div class="text-sm font-medium text-slate-900">Admin</div>
+                                    <div class="text-xs text-slate-600">Manages users and organizational settings</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
+                                <i class="fas fa-calculator text-green-600 mr-3"></i>
+                                <div>
+                                    <div class="text-sm font-medium text-slate-900">Accountant</div>
+                                    <div class="text-xs text-slate-600">Handles transactions and financial records</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sign In Button -->
+                    <div class="text-center pt-4">
+                        <p class="text-slate-600 text-sm mb-4">Already have an Qw8Rt5Entity?</p>
+                        <a asp-page="./Login" 
+                           class="inline-flex items-center px-6 py-3 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white rounded-xl transition-all duration-300 font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98]">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

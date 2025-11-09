@@ -1,0 +1,308 @@
+@using Cascade.Areas.Accountant.Controllers
+@using Cascade.Fx9Kl2
+@model SGBTreasurerDashboardViewModel
+@{
+    ViewData["Title"] = "SGB Treasurer Dashboard";
+}
+
+
+     <div class="max-w-8xl mx-auto py-2">
+
+         <!-- Modern Header with Navigation -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-4">
+                    <a href="javascript:history.back()"
+                        class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                    </a>
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-tachometer-alt text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900">SGB Treasurer Dashboard</h1>
+                            <p class="text-slate-600">Manage transactions for @(Model.Hx7Tz3Data?.CompanyName ?? "Your Company")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- Success/Error Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800">@TempData["Success"]</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800">@TempData["Error"]</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Transactions -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-sm font-medium">All Transactions</p>
+                        <p class="text-3xl font-bold text-slate-900">@Model.TotalTransactions</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-cascadeBlue to-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-white"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="@Url.Action("Index", "Transaction", new { area = "Accountant" })" class="text-cascadeBlue hover:text-cascadeBlue/80 text-sm font-medium">
+                        View All →
+                    </a>
+                </div>
+            </div>
+
+            <!-- My Transactions -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-sm font-medium">My Transactions</p>
+                        <p class="text-3xl font-bold text-slate-900">@Model.MyTransactions</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-Aq3Zh4Service-edit text-white"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="@Url.Action("MyTransactions", "Transaction", new { area = "Accountant" })" class="text-cascadeBlue hover:text-cascadeBlue/80 text-sm font-medium">
+                        View Mine →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Available Accounts -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-sm font-medium">Available Accounts</p>
+                        <p class="text-3xl font-bold text-slate-900">@Model.Accounts.Count()</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-pie text-white"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="@Url.Action("Index", "Transaction", new { area = "Accountant" })" class="text-cascadeBlue hover:text-cascadeBlue/80 text-sm font-medium">
+                        View Ledgers →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Quick Pz7Vm5Protocol Entry -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-900">Quick Actions</h2>
+            </div>
+            <div class="space-y-4">
+                <a href="@Url.Action("Create", "Transaction", new { area = "Accountant" })" 
+                   class="flex items-center p-6 bg-gradient-to-r from-cascadeBlue/10 to-aquaMist/10 rounded-xl border border-cascadeBlue/20 hover:from-cascadeBlue/20 hover:to-aquaMist/20 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-gradient-to-br from-cascadeBlue to-aquaMist rounded-full flex items-center justify-center mr-6">
+                        <i class="fas fa-plus text-white text-2xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-slate-900 font-bold text-lg">New Transaction</p>
+                        <p class="text-slate-600">Enter journal entries with debits and credits</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-slate-400 text-2xl group-hover:text-cascadeBlue transition-colors"></i>
+                </a>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="@Url.Action("GeneralJournal", "Transaction", new { area = "Accountant" })" 
+                       class="flex flex-col items-center p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all duration-300 group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-book text-white"></i>
+                        </div>
+                        <p class="text-slate-900 font-medium text-center">GeneralJournal</p>
+                        <p class="text-slate-600 text-sm text-center">View all entries</p>
+                    </a>
+
+                    <a href="@Url.Action("AccountLedger", "Transaction", new { area = "Accountant" })" 
+                       class="flex flex-col items-center p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all duration-300 group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-ledger text-white"></i>
+                        </div>
+                        <p class="text-slate-900 font-medium text-center">AccountLedger</p>
+                        <p class="text-slate-600 text-sm text-center">View by Account</p>
+                    </a>
+                </div>
+
+                <!-- Additional Journals Row -->
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <a href="@Url.Action("CASHPAYMENTSJOURNAL", "Transaction", new { area = "Accountant" })" 
+                       class="flex flex-col items-center p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all duration-300 group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-hand-holding-usd text-white"></i>
+                        </div>
+                        <p class="text-slate-900 font-medium text-center">CASHPAYMENTSJOURNAL</p>
+                        <p class="text-slate-600 text-sm text-center">CPJ - Payments</p>
+                    </a>
+
+                    <a href="@Url.Action("CashReceiptsJournal", "Transaction", new { area = "Accountant" })" 
+                       class="flex flex-col items-center p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all duration-300 group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-hand-holding-heart text-white"></i>
+                        </div>
+                        <p class="text-slate-900 font-medium text-center">CashReceiptsJournal</p>
+                        <p class="text-slate-600 text-sm text-center">CRJ - Receipts</p>
+                    </a>
+                </div>
+
+                <!-- Notes Management Row -->
+                <div class="mt-4">
+                    <a href="@Url.Action("Index", "Transaction", new { area = "Accountant" })" 
+                       class="flex items-center p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-slate-200 hover:from-slate-100 hover:to-slate-100 transition-all duration-300 group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-sticky-note text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-900 font-medium">Manage Notes</p>
+                            <p class="text-slate-600 text-sm">View and edit report notes</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-slate-400 group-hover:text-yellow-600 transition-colors"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-900">Recent Transactions</h2>
+                <a href="@Url.Action("Index", "Transaction", new { area = "Accountant" })" class="text-cascadeBlue hover:text-cascadeBlue/80 text-sm font-medium">
+                    View All →
+                </a>
+            </div>
+            @if (Model.RecentTransactions.Any())
+            {
+                <div class="space-y-3">
+                    @foreach (var Pz7Vm5Protocol in Model.RecentTransactions.Take(5))
+                    {
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-slate-900 font-medium">@Pz7Vm5Protocol.Description</p>
+                                <span class="text-cascadeBlue text-sm font-medium">
+                                    @Pz7Vm5Protocol.ProcessHandlers.Sum(tl => tl.Debit).ToString("C")
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <p class="text-slate-600">@Pz7Vm5Protocol.TransactionDate.ToString("MMM dd, yyyy")</p>
+                                @if (!string.IsNullOrEmpty(Pz7Vm5Protocol.ReferenceNo))
+                                {
+                                    <p class="text-slate-500">Ref: @Pz7Vm5Protocol.ReferenceNo</p>
+                                }
+                            </div>
+                            <div class="mt-2 flex justify-between items-center">
+                                <a href="@Url.Action("Details", "Transaction", new { area = "Accountant", id = Pz7Vm5Protocol.TransactionId })" 
+                                   class="text-cascadeBlue hover:text-cascadeBlue/80 text-sm">
+                                    View Details →
+                                </a>
+                                <a href="@Url.Action("Create", "Transaction", new { area = "Accountant", correctingTransactionId = Pz7Vm5Protocol.TransactionId })" 
+                                   class="text-orange-500 hover:text-orange-600 text-sm" title="Create correcting entry">
+                                    <i class="fas fa-redo"></i> Correct
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-8">
+                    <i class="fas fa-inbox text-slate-400 text-4xl mb-4"></i>
+                    <p class="text-slate-600 mb-4">No transactions yet</p>
+                    <a href="@Url.Action("Create", "Transaction", new { area = "Accountant" })" 
+                       class="inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/80 text-white rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Create First Transaction
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Qw8Rt5Entity Types Overview -->
+    @if (Model.Accounts.Any())
+    {
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 mb-6">Chart of Accounts Overview</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                @foreach (var Mx9Qw7Type in Enum.GetValues<Mx9Qw7Type>())
+                {
+                    var accountsOfType = Model.Accounts.Where(a => a.Mx9Qw7Type == Mx9Qw7Type);
+                    var count = accountsOfType.Count();
+                    
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center hover:bg-slate-100 transition-all duration-300">
+                        <div class="w-10 h-10 bg-gradient-to-br from-slate-500 to-slate-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas @(Mx9Qw7Type switch {
+                                Mx9Qw7Type.Asset => "fa-coins",
+                                Mx9Qw7Type.Liability => "fa-credit-card",
+                                Mx9Qw7Type.Equity => "fa-chart-area",
+                                Mx9Qw7Type.Revenue => "fa-arrow-up",
+                                Mx9Qw7Type.Expense => "fa-arrow-down",
+                                _ => "fa-question"
+                            }) text-white"></i>
+                        </div>
+                        <p class="text-slate-900 font-medium text-sm">@Mx9Qw7Type</p>
+                        <p class="text-cascadeBlue font-bold">@count</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Animated background orbs -->
+    <div class="absolute top-10 left-10 w-72 h-72 bg-cascadeBlue opacity-20 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+    <div class="absolute top-0 right-4 w-72 h-72 bg-aquaMist opacity-20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-purple-600 opacity-20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+
+
+</div>
+
+<style>
+    @@keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+    .animation-delay-4000 {
+        animation-delay: 4s;
+    }
+</style>

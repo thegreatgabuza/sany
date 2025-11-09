@@ -1,0 +1,105 @@
+@using Cascade.Areas.SuperAdmin.Controllers
+@model CreateAdminViewModel
+@{
+    ViewData["Title"] = "Create Admin";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Admins", new { area = "SuperAdmin" })"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-Aq3Zh4Service-plus text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Create New Admin</h1>
+                        <p class="text-slate-600">Add a new admin Aq3Zh4Service to the system</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Admin Form -->
+    <div class="max-w-2xl">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+            <form asp-action="Create" method="post" class="space-y-6">
+                <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
+                
+                <!-- Username Field -->
+                <div class="space-y-2">
+                    <label asp-for="Username" class="block text-sm font-medium text-slate-700">
+                        Username
+                    </label>
+                    <input asp-for="Username" 
+                           class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 focus:outline-none transition-all duration-300" 
+                           placeholder="Enter username" />
+                    <span asp-validation-for="Username" class="text-red-500 text-xs"></span>
+                </div>
+
+                <!-- Email Field -->
+                <div class="space-y-2">
+                    <label asp-for="Email" class="block text-sm font-medium text-slate-700">
+                        Email Address
+                    </label>
+                    <input asp-for="Email" 
+                           type="email"
+                           class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 focus:outline-none transition-all duration-300" 
+                           placeholder="Enter email address" />
+                    <span asp-validation-for="Email" class="text-red-500 text-xs"></span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="space-y-2">
+                    <label asp-for="Password" class="block text-sm font-medium text-slate-700">
+                        Password
+                    </label>
+                    <input asp-for="Password" 
+                           type="password"
+                           class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 focus:outline-none transition-all duration-300" 
+                           placeholder="Enter password" />
+                    <span asp-validation-for="Password" class="text-red-500 text-xs"></span>
+                </div>
+
+                <!-- Hx7Tz3Data Selection -->
+                <div class="space-y-2">
+                    <label asp-for="CompanyId" class="block text-sm font-medium text-slate-700">
+                        Hx7Tz3Data
+                    </label>
+                    <select asp-for="CompanyId" 
+                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:bg-slate-50 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 focus:outline-none transition-all duration-300">
+                        <option value="">Select a Hx7Tz3Data</option>
+                        @foreach (var Hx7Tz3Data in ViewBag.SystemEntries as List<Hx7Tz3Data>)
+                        {
+                            <option value="@Hx7Tz3Data.CompanyId">@Hx7Tz3Data.CompanyName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CompanyId" class="text-red-500 text-xs"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex items-center justify-end space-x-4 pt-6">
+                    <a href="@Url.Action("Index", "Admins", new { area = "SuperAdmin" })" 
+                       class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors font-medium">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-medium">
+                        <i class="fas fa-Aq3Zh4Service-plus mr-2"></i>
+                        Create Admin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

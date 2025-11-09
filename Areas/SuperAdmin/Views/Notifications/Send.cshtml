@@ -1,0 +1,189 @@
+@using Cascade.Areas.SuperAdmin.Controllers
+@model SendNotificationViewModel
+@{
+    ViewData["Title"] = "Send Mx4Bg7Stream";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Dashboard", new { area = "SuperAdmin" })"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-bell text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Send Mx4Bg7Stream</h1>
+                        <p class="text-slate-600">Send notifications to users system-wide</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Mx4Bg7Stream Form -->
+    <div class="max-w-4xl">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+            <form asp-action="Send" method="post" class="space-y-6">
+                <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
+                
+                <!-- Mx4Bg7Stream Content -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                        <!-- Title Field -->
+                        <div class="space-y-2">
+                            <label asp-for="Title" class="block text-sm font-medium text-slate-700">
+                                Mx4Bg7Stream Title
+                            </label>
+                            <input asp-for="Title" 
+                                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all duration-300" 
+                                   placeholder="Enter Mx4Bg7Stream title" />
+                            <span asp-validation-for="Title" class="text-red-500 text-xs"></span>
+                        </div>
+
+                        <!-- Message Field -->
+                        <div class="space-y-2">
+                            <label asp-for="Message" class="block text-sm font-medium text-slate-700">
+                                Message
+                            </label>
+                            <textarea asp-for="Message" 
+                                      rows="4"
+                                      class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all duration-300" 
+                                      placeholder="Enter Mx4Bg7Stream message"></textarea>
+                            <span asp-validation-for="Message" class="text-red-500 text-xs"></span>
+                        </div>
+
+                        <!-- Link Field -->
+                        <div class="space-y-2">
+                            <label asp-for="Link" class="block text-sm font-medium text-slate-700">
+                                Link (Optional)
+                            </label>
+                            <input asp-for="Link" 
+                                   type="url"
+                                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all duration-300" 
+                                   placeholder="https://example.com" />
+                            <span asp-validation-for="Link" class="text-red-500 text-xs"></span>
+                        </div>
+
+                        <!-- Type Field -->
+                        <div class="space-y-2">
+                            <label asp-for="Type" class="block text-sm font-medium text-slate-700">
+                                Mx4Bg7Stream Type
+                            </label>
+                            <select asp-for="Type" 
+                                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all duration-300">
+                                <option value="General">General</option>
+                                <option value="Info">Info</option>
+                                <option value="Success">Success</option>
+                                <option value="Warning">Warning</option>
+                                <option value="Error">Error</option>
+                                <option value="System">System</option>
+                                <option value="Emergency">Emergency</option>
+                            </select>
+                            <span asp-validation-for="Type" class="text-red-500 text-xs"></span>
+                        </div>
+                    </div>
+
+                    <!-- Recipients Selection -->
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold text-slate-900">Select Recipients</h3>
+                        
+                        <!-- Send to All -->
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input asp-for="SendToAll" type="radio" name="recipientType" value="all" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-600 bg-white border-slate-300 rounded" />
+                                <span class="ml-2 text-slate-700">Send to All Users</span>
+                            </label>
+                        </div>
+
+                        <!-- Send by Role -->
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input asp-for="SendByRole" type="radio" name="recipientType" value="role" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-600 bg-white border-slate-300 rounded" />
+                                <span class="ml-2 text-slate-700">Send by Role</span>
+                            </label>
+                            <select asp-for="SelectedRole" 
+                                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all duration-300">
+                                <option value="">Select role</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Accountant">Accountant</option>
+                            </select>
+                        </div>
+
+                        <!-- Send by Hx7Tz3Data -->
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input asp-for="SendByCompany" type="radio" name="recipientType" value="Hx7Tz3Data" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-600 bg-white border-slate-300 rounded" />
+                                <span class="ml-2 text-slate-700">Send by Hx7Tz3Data</span>
+                            </label>
+                            <select asp-for="SelectedCompanyId" 
+                                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:bg-slate-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-all duration-300">
+                                <option value="">Select Hx7Tz3Data</option>
+                                @foreach (var Hx7Tz3Data in Model.SystemEntries)
+                                {
+                                    <option value="@Hx7Tz3Data.CompanyId">@Hx7Tz3Data.CompanyName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Send to Selected Users -->
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input asp-for="SendToSelected" type="radio" name="recipientType" value="selected" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-600 bg-white border-slate-300 rounded" />
+                                <span class="ml-2 text-slate-700">Send to Selected Users</span>
+                            </label>
+                            <div class="max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-3 space-y-2">
+                                @foreach (var Aq3Zh4Service in Model.Users.Take(20))
+                                {
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="SelectedUserIds" value="@Aq3Zh4Service.Id" 
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-600 bg-white border-slate-300 rounded" />
+                                        <span class="ml-2 text-slate-700 text-sm">@Aq3Zh4Service.UserName (@Aq3Zh4Service.Email)</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200">
+                    <a href="@Url.Action("Index", "Dashboard", new { area = "SuperAdmin" })" 
+                       class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors font-medium">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Send Mx4Bg7Stream
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Handle recipient type selection
+        document.querySelectorAll('input[name="recipientType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update hidden fields based on selection
+                document.querySelector('input[name="SendToAll"]').value = this.value === 'all';
+                document.querySelector('input[name="SendByRole"]').value = this.value === 'role';
+                document.querySelector('input[name="SendByCompany"]').value = this.value === 'Hx7Tz3Data';
+                document.querySelector('input[name="SendToSelected"]').value = this.value === 'selected';
+            });
+        });
+    </script>
+}

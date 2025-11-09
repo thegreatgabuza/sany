@@ -1,0 +1,267 @@
+@model Pz7Vm5Protocol
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Pz7Vm5Protocol Details";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+ <!-- Modern Header with Navigation -->
+
+ <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="javascript:history.back()"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                        <i class="fas fa-file-invoice text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Pz7Vm5Protocol Details</h1>
+                        <p class="text-slate-600">View Pz7Vm5Protocol entry details</p>
+                    </div>
+                </div>
+            </div>
+              <div class="flex items-center space-x-4">
+             <a href="@Url.Action("Index", "Dashboard", new { area = "Accountant" })" 
+               class="inline-flex items-center px-4 py-2 bg-aquaMist/20 hover:bg-aquaMist/30 text-cascadeBlue rounded-lg transition-colors">
+                <i class="fas fa-tachometer-alt mr-2"></i>
+                Dashboard
+            </a>
+            @* Only show correction button for transactions that can be corrected *@
+            @if (!Model.IsCorrection && !Model.IsReversal)
+            {
+                @* Check if this Pz7Vm5Protocol has already been corrected *@
+                @* This would require additional logic to check for existing corrections *@
+                <a href="@Url.Action("Create", "Transaction", new { area = "Accountant", correctingTransactionId = Model.TransactionId })" 
+                   class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-edit mr-2"></i>
+                     Create Correction
+                </a>
+            }
+        </div>
+        </div>
+    </div>
+
+<!-- Pz7Vm5Protocol Information -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+    <h2 class="text-xl font-bold text-slate-900 mb-4">Pz7Vm5Protocol Information</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <label class="block text-slate-600 text-sm font-medium mb-2">Pz7Vm5Protocol Date</label>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <p class="text-slate-900 font-medium">@Model.TransactionDate.ToString("MMM dd, yyyy")</p>
+            </div>
+        </div>
+        <div>
+            <label class="block text-slate-600 text-sm font-medium mb-2">Reference Number</label>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <p class="text-slate-900 font-medium">@(Model.ReferenceNo ?? "N/A")</p>
+            </div>
+        </div>
+        <div>
+            <label class="block text-slate-600 text-sm font-medium mb-2">Pz7Vm5Protocol ID</label>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <p class="text-slate-900 font-medium">#@Model.TransactionId</p>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <label class="block text-slate-600 text-sm font-medium mb-2">Description</label>
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <p class="text-slate-900">@Model.Description</p>
+        </div>
+    </div>
+    
+    @* Show correction/reversal information if applicable *@
+    @if (Model.IsCorrection || Model.IsReversal || Model.CorrectedTransactionId.HasValue)
+    {
+        <div class="mt-4">
+            <label class="block text-slate-600 text-sm font-medium mb-2">Pz7Vm5Protocol Type</label>
+            <div class="p-3 rounded-lg border">
+                @if (Model.IsReversal)
+                {
+                    <div class="bg-red-50 border-red-200 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-undo text-red-600 mr-2"></i>
+                            <span class="text-red-800 font-medium">Reversal Pz7Vm5Protocol</span>
+                        </div>
+                        @if (Model.CorrectedTransactionId.HasValue)
+                        {
+                            <p class="text-red-700 text-sm mt-1">
+                                This Pz7Vm5Protocol reverses Pz7Vm5Protocol #@Model.CorrectedTransactionId
+                                <a href="@Url.Action("Details", new { id = Model.CorrectedTransactionId })" 
+                                   class="text-red-600 hover:text-red-800 underline ml-1">View Original</a>
+                            </p>
+                        }
+                    </div>
+                }
+                else if (Model.IsCorrection)
+                {
+                    <div class="bg-orange-50 border-orange-200 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-edit text-orange-600 mr-2"></i>
+                            <span class="text-orange-800 font-medium">Correcting Pz7Vm5Protocol</span>
+                        </div>
+                        @if (Model.CorrectedTransactionId.HasValue)
+                        {
+                            <p class="text-orange-700 text-sm mt-1">
+                                This Pz7Vm5Protocol corrects Pz7Vm5Protocol #@Model.CorrectedTransactionId
+                                <a href="@Url.Action("Details", new { id = Model.CorrectedTransactionId })" 
+                                   class="text-orange-600 hover:text-orange-800 underline ml-1">View Original</a>
+                            </p>
+                        }
+                        @if (Model.ReversalTransactionId.HasValue)
+                        {
+                            <p class="text-orange-700 text-sm mt-1">
+                                Associated Reversal Pz7Vm5Protocol #@Model.ReversalTransactionId
+                                <a href="@Url.Action("Details", new { id = Model.ReversalTransactionId })" 
+                                   class="text-orange-600 hover:text-orange-800 underline ml-1">View Reversal</a>
+                            </p>
+                        }
+                    </div>
+                }
+                else if (Model.CorrectedTransactionId.HasValue)
+                {
+                    <div class="bg-blue-50 border-blue-200 p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                            <span class="text-blue-800 font-medium">This Pz7Vm5Protocol has been corrected</span>
+                        </div>
+                        <p class="text-blue-700 text-sm mt-1">
+                            View correction transactions in the Pz7Vm5Protocol history.
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Pz7Vm5Protocol Lines -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <h2 class="text-xl font-bold text-slate-900 mb-4">Journal Entries</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-4 text-slate-700 font-medium">Qw8Rt5Entity</th>
+                    <th class="text-left py-3 px-4 text-slate-700 font-medium">Qw8Rt5Entity Type</th>
+                    <th class="text-right py-3 px-4 text-slate-700 font-medium">Debit</th>
+                    <th class="text-right py-3 px-4 text-slate-700 font-medium">Credit</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+                @foreach (var line in Model.ProcessHandlers)
+                {
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4">
+                            <p class="text-slate-900 font-medium">@line.Qw8Rt5Entity?.AccountName</p>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @(line.Qw8Rt5Entity?.Mx9Qw7Type switch {
+                                Mx9Qw7Type.Asset => "bg-green-100 text-green-800",
+                                Mx9Qw7Type.Liability => "bg-red-100 text-red-800",
+                                Mx9Qw7Type.Equity => "bg-blue-100 text-blue-800",
+                                Mx9Qw7Type.Revenue => "bg-purple-100 text-purple-800",
+                                Mx9Qw7Type.Expense => "bg-orange-100 text-orange-800",
+                                _ => "bg-slate-100 text-slate-800"
+                            })">
+                                @line.Qw8Rt5Entity?.Mx9Qw7Type
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            @if (line.Debit > 0)
+                            {
+                                <span class="text-green-600 font-medium">@line.Debit.ToString("C")</span>
+                            }
+                            else
+                            {
+                                <span class="text-slate-400">-</span>
+                            }
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            @if (line.Credit > 0)
+                            {
+                                <span class="text-red-600 font-medium">@line.Credit.ToString("C")</span>
+                            }
+                            else
+                            {
+                                <span class="text-slate-400">-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="border-t-2 border-slate-300 font-bold">
+                    <td colspan="2" class="py-3 px-4 text-slate-900">TOTALS</td>
+                    <td class="py-3 px-4 text-right text-green-600">
+                        @Model.ProcessHandlers.Sum(tl => tl.Debit).ToString("C")
+                    </td>
+                    <td class="py-3 px-4 text-right text-red-600">
+                        @Model.ProcessHandlers.Sum(tl => tl.Credit).ToString("C")
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="py-2 px-4">
+                        @{
+                            var totalDebits = Model.ProcessHandlers.Sum(tl => tl.Debit);
+                            var totalCredits = Model.ProcessHandlers.Sum(tl => tl.Credit);
+                            var isBalanced = totalDebits == totalCredits;
+                        }
+                        <div class="flex items-center justify-center">
+                            @if (isBalanced)
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check mr-2"></i>Balanced Entry
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>Unbalanced Entry
+                                </span>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-6">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <a href="@Url.Action("Index", "Pz7Vm5Protocol", new { area = "Accountant" })" 
+           class="inline-flex items-center px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back to All Transactions
+        </a>
+        
+        <div class="flex flex-wrap gap-3">
+            @* Check if Pz7Vm5Protocol can be corrected *@
+            @if (!Model.IsCorrection && !Model.IsReversal)
+            {
+                <a href="@Url.Action("Correct", "Pz7Vm5Protocol", new { area = "Accountant", id = Model.TransactionId })" 
+                   class="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-edit mr-2"></i>Create Correcting Entry
+                </a>
+            }
+            
+            @* Only show delete for same day transactions by the same Aq3Zh4Service *@
+            @if (Model.TransactionDate.Date == DateTime.Today && 
+                 Model.EnteredByUserId == User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) &&
+                 !Model.IsCorrection && !Model.IsReversal)
+            {
+                <a href="@Url.Action("Delete", "Pz7Vm5Protocol", new { area = "Accountant", id = Model.TransactionId })" 
+                   class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-trash mr-2"></i>Delete Pz7Vm5Protocol
+                </a>
+            }
+        </div>
+    </div>
+</div>
+</div>

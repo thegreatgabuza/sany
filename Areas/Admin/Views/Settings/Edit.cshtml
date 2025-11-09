@@ -1,0 +1,201 @@
+@model Hx7Tz3Data
+@{
+    ViewData["Title"] = "Edit Company Settings";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Settings", new { area = "Admin" })"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                        <i class="fas fa-edit text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Edit Company Settings</h1>
+                        <p class="text-slate-600">Update your Company information and financial year configuration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="CompanyId" />
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Hx7Tz3Data Information -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">
+                    <i class="fas fa-building mr-2 text-cascadeBlue"></i>Company Information
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label asp-for="CompanyName" class="block text-slate-700 font-medium mb-2">
+                            <i class="fas fa-building mr-2 text-cascadeBlue"></i>Company Name *
+                        </label>
+                        <input asp-for="CompanyName" 
+                               class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent" 
+                               placeholder="Enter Company name" />
+                        <span asp-validation-for="CompanyName" class="text-red-600 text-sm mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Address" class="block text-slate-700 font-medium mb-2">
+                            <i class="fas fa-map-marker-alt mr-2 text-cascadeBlue"></i>Address
+                        </label>
+                        <textarea asp-for="Address" rows="3"
+                                  class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent" 
+                                  placeholder="Enter Company address"></textarea>
+                        <span asp-validation-for="Address" class="text-red-600 text-sm mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="ContactInfo" class="block text-slate-700 font-medium mb-2">
+                            <i class="fas fa-phone mr-2 text-cascadeBlue"></i>Contact Information
+                        </label>
+                        <input asp-for="ContactInfo" 
+                               class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent" 
+                               placeholder="Phone, email, etc." />
+                        <span asp-validation-for="ContactInfo" class="text-red-600 text-sm mt-1 block"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Year Configuration -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">
+                    <i class="fas fa-calendar-alt mr-2 text-cascadeBlue"></i>Financial Year Configuration
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label asp-for="FinancialYearEndMonth" class="block text-slate-700 font-medium mb-2">
+                            <i class="fas fa-calendar mr-2 text-cascadeBlue"></i>Financial Year End Month *
+                        </label>
+                        <select asp-for="FinancialYearEndMonth" 
+                                class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <span asp-validation-for="FinancialYearEndMonth" class="text-red-600 text-sm mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="FinancialYearEndDay" class="block text-slate-700 font-medium mb-2">
+                            <i class="fas fa-calendar-day mr-2 text-cascadeBlue"></i>Financial Year End Day *
+                        </label>
+                        <select asp-for="FinancialYearEndDay" 
+                                class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent">
+                            @for (int day = 1; day <= 31; day++)
+                            {
+                                <option value="@day">@day</option>
+                            }
+                        </select>
+                        <span asp-validation-for="FinancialYearEndDay" class="text-red-600 text-sm mt-1 block"></span>
+                    </div>
+
+                    <!-- Preview of Financial Year -->
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 class="text-blue-800 font-medium mb-2">Preview</h4>
+                        <div id="financialYearPreview" class="text-blue-700">
+                            <!-- Will be updated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-4 mt-8">
+            <a href="@Url.Action("Index", "Settings", new { area = "Admin" })" 
+               class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="px-8 py-3 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white rounded-lg transition-colors font-medium">
+                <i class="fas fa-save mr-2"></i>Save Settings
+            </button>
+        </div>
+    </form>
+
+    <!-- Information Panel -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mt-8">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-triangle text-amber-600 mt-1 mr-3"></i>
+            <div>
+                <h3 class="text-amber-800 font-bold mb-2">Important Notice</h3>
+                <div class="text-amber-700 space-y-2">
+                    <p>• Changing the financial year end date will affect how reports calculate default date ranges.</p>
+                    <p>• Existing transactions and reports will not be affected, but new reports will use the updated configuration.</p>
+                    <p>• Common financial year ends: March 31st (South Africa, India), December 31st (US), June 30th (Australia).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Update financial year preview when month or day changes
+        function updateFinancialYearPreview() {
+            const month = document.getElementById('FinancialYearEndMonth').value;
+            const day = document.getElementById('FinancialYearEndDay').value;
+            
+            if (month && day) {
+                const monthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                
+                const monthName = monthNames[parseInt(month) - 1];
+                const currentYear = new Date().getFullYear();
+                
+                // Calculate financial year period
+                const fyEnd = new Date(currentYear, parseInt(month) - 1, parseInt(day));
+                const today = new Date();
+                
+                let fyYear, fyStart, fyEndDate;
+                if (today <= fyEnd) {
+                    fyYear = currentYear;
+                    fyStart = new Date(currentYear - 1, parseInt(month) - 1, parseInt(day) + 1);
+                    fyEndDate = fyEnd;
+                } else {
+                    fyYear = currentYear + 1;
+                    fyStart = new Date(currentYear, parseInt(month) - 1, parseInt(day) + 1);
+                    fyEndDate = new Date(currentYear + 1, parseInt(month) - 1, parseInt(day));
+                }
+                
+                document.getElementById('financialYearPreview').innerHTML = `
+                    <strong>Financial Year End:</strong> ${day} ${monthName}<br>
+                    <strong>Current Financial Year:</strong> ${fyYear}<br>
+                    <strong>Current Period:</strong> ${fyStart.toLocaleDateString()} - ${fyEndDate.toLocaleDateString()}
+                `;
+            }
+        }
+        
+        // Initialize preview and add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            updateFinancialYearPreview();
+            
+            document.getElementById('FinancialYearEndMonth').addEventListener('change', updateFinancialYearPreview);
+            document.getElementById('FinancialYearEndDay').addEventListener('change', updateFinancialYearPreview);
+        });
+    </script>
+}

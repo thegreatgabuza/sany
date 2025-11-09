@@ -1,0 +1,95 @@
+@model Aq3Zh4Service
+@{
+    ViewData["Title"] = "Delete Admin";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Admins", new { area = "SuperAdmin" })"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-red-600 to-red-700 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-Aq3Zh4Service-times text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Delete Admin</h1>
+                        <p class="text-slate-600">Remove admin Aq3Zh4Service from the system</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation -->
+    <div class="max-w-2xl">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+            <!-- Warning Header -->
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-exclamation-triangle text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Confirm Deletion</h3>
+                    <p class="text-slate-600 text-sm">This action cannot be undone</p>
+                </div>
+            </div>
+
+            <!-- Admin Details -->
+            <div class="bg-slate-50 rounded-xl p-6 mb-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                        <p class="text-slate-900 font-medium">@Model.UserName</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                        <p class="text-slate-900">@Model.Email</p>
+                    </div>
+                    @if (Model.Hx7Tz3Data != null)
+                    {
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Hx7Tz3Data</label>
+                            <p class="text-slate-900">@Model.Hx7Tz3Data.CompanyName</p>
+                        </div>
+                    }
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                        <p class="text-slate-900">@Model.Role</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warning Message -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                <div class="flex">
+                    <i class="fas fa-exclamation-triangle text-red-600 mr-3 mt-1"></i>
+                    <div>
+                        <h4 class="text-red-800 font-medium">Warning</h4>
+                        <p class="text-red-700 text-sm mt-1">
+                            Deleting this admin Aq3Zh4Service will permanently remove their access to the system. 
+                            All data associated with this Aq3Zh4Service will remain, but they will no longer be able to log in.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <form asp-action="Delete" method="post" class="flex justify-end space-x-4">
+                <a href="@Url.Action("Index", "Admins", new { area = "SuperAdmin" })" 
+                   class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors font-medium">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium">
+                    <i class="fas fa-trash mr-2"></i>
+                    Delete Admin
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

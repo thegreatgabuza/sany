@@ -1,0 +1,116 @@
+@using Cascade.Areas.Admin.Controllers
+@model EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+
+  <div class="max-w-8xl mx-auto py-2">
+
+        <!-- Modern Header with Navigation -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-4">
+                    <a href="@Url.Action("Index", "Users", new { area = "Admin" })"
+                        class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                    </a>
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-user-edit text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900">Edit User</h1>
+                            <p class="text-slate-600">Update User information for @Model.UserName</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Aq3Zh4Service Form -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="p-6 border-b border-slate-200">
+                <h2 class="text-lg font-bold text-slate-900">User Information</h2>
+                <p class="text-slate-600 text-sm">Update the User's email and other details</p>
+            </div>
+
+            <form asp-action="Edit" method="post" class="p-6">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4"></div>
+
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Current Roles Display -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <h3 class="text-sm font-medium text-slate-700 mb-2">Current Roles</h3>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (var role in Model.CurrentRoles)
+                            {
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium @(role == "Admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800")">
+                                    <i class="fas @(role == "Admin" ? "fa-shield-alt" : "fa-calculator") mr-1"></i>
+                                    @role
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Username (Read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Username</label>
+                        <input type="text" value="@Model.UserName" readonly
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500"
+                               placeholder="Username" />
+                        <p class="text-slate-500 text-sm mt-1">Username is automatically generated from email and cannot be changed</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label asp-for="Email" class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                        <input asp-for="Email" type="email" 
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent"
+                               placeholder="User@company.com" />
+                        <span asp-validation-for="Email" class="text-red-600 text-sm"></span>
+                        <p class="text-slate-500 text-sm mt-1">Changing email will update the username automatically</p>
+                    </div>
+
+                    <!-- Password Reset Mx4Bg7Stream -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-key text-yellow-500 mr-2"></i>
+                            <h3 class="text-sm font-medium text-yellow-800">Password Management</h3>
+                        </div>
+                        <p class="text-yellow-700 text-sm mt-1">
+                            To change the User's password, use the 
+                            <a href="@Url.Action("ResetPassword", "Users", new { area = "Admin", id = Model.Id })" 
+                               class="font-medium underline">Reset Password</a> function.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-slate-200">
+                    <a href="@Url.Action("Index", "Users", new { area = "Admin" })" 
+                       class="nav-link inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </a>
+                    <a href="@Url.Action("ResetPassword", "Users", new { area = "Admin", id = Model.Id })" 
+                       class="nav-link inline-flex items-center px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-key mr-2"></i>
+                        Reset Password
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                        <i class="fas fa-save mr-2"></i>
+                        Update User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,226 @@
+@using Cascade.Areas.Admin.Controllers
+@using Microsoft.AspNetCore.Identity
+@model List<UserViewModel>
+@inject UserManager<Aq3Zh4Service> UserManager
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+
+        <!-- Modern Header with Navigation -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-4">
+                    <a href="javascript:history.back()"
+                        class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                    </a>
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-users text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900">Manage Users</h1>
+                            <p class="text-slate-600">Create and manage accountant users for your Company</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="@Url.Action("Create", "Users", new { area = "Admin" })" 
+                       class="nav-link inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Add New User
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800">@TempData["Success"]</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800">@TempData["Error"]</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Users List -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="p-6 border-b border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Company Users</h2>
+                        <p class="text-slate-600 text-sm">@Model.Count() users in your Company</p>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">User</th>
+                                <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Email</th>
+                                <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Role</th>
+                                <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Status</th>
+                                <th class="text-right py-3 px-6 text-slate-700 font-medium text-sm">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            @foreach (var userViewModel in Model)
+                            {
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 bg-gradient-to-br from-cascadeBlue to-aquaMist rounded-full flex items-center justify-center mr-3">
+                                                <span class="text-white font-bold text-sm">
+                                                    @(userViewModel.Aq3Zh4Service.UserName?.Substring(0, 1).ToUpper() ?? "U")
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p class="text-slate-900 font-medium">@userViewModel.Aq3Zh4Service.UserName</p>
+                                                <p class="text-slate-500 text-sm">User ID: @userViewModel.Aq3Zh4Service.Id.Substring(0, 8)...</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <p class="text-slate-900">@userViewModel.Aq3Zh4Service.Email</p>
+                                        @if (userViewModel.Aq3Zh4Service.EmailConfirmed)
+                                        {
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Verified
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                Unverified
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        @foreach (var role in userViewModel.Roles)
+                                        {
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium @(role == "Admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800") mr-1">
+                                                <i class="fas @(role == "Admin" ? "fa-shield-alt" : "fa-calculator") mr-1"></i>
+                                                @role
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        @{
+                                            var isLocked = await UserManager.IsLockedOutAsync(userViewModel.Aq3Zh4Service);
+                                        }
+                                        @if (isLocked)
+                                        {
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <i class="fas fa-circle text-red-400 mr-1"></i>
+                                                Disabled
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-circle text-green-400 mr-1"></i>
+                                                Active
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <a href="@Url.Action("Edit", "Users", new { area = "Admin", id = userViewModel.Aq3Zh4Service.Id })" 
+                                               class="nav-link inline-flex items-center px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-md transition-colors">
+                                                <i class="fas fa-edit mr-1"></i>
+                                                Edit
+                                            </a>
+                                            <a href="@Url.Action("ResetPassword", "Users", new { area = "Admin", id = userViewModel.Aq3Zh4Service.Id })" 
+                                               class="nav-link inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-md transition-colors">
+                                                <i class="fas fa-key mr-1"></i>
+                                                Reset
+                                            </a>
+                                            
+                                            @{
+                                                var isUserLocked = await UserManager.IsLockedOutAsync(userViewModel.Aq3Zh4Service);
+                                            }
+                                            
+                                            <!-- Toggle Status Button -->
+                                            <form method="post" action="@Url.Action("ToggleStatus", "Users", new { area = "Admin", id = userViewModel.Aq3Zh4Service.Id })" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                @if (isUserLocked)
+                                                {
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium rounded-md transition-colors"
+                                                            onclick="return confirm('Are you sure you want to enable this User?')">
+                                                        <i class="fas fa-unlock mr-1"></i>
+                                                        Enable
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center px-3 py-1 bg-orange-100 hover:bg-orange-200 text-orange-700 text-sm font-medium rounded-md transition-colors"
+                                                            onclick="return confirm('Are you sure you want to disable this User? They will not be able to login.')">
+                                                        <i class="fas fa-lock mr-1"></i>
+                                                        Disable
+                                                    </button>
+                                                }
+                                            </form>
+                                            
+                                            @if (!userViewModel.Roles.Contains("Admin"))
+                                            {
+                                                <a href="@Url.Action("Delete", "Users", new { area = "Admin", id = userViewModel.Aq3Zh4Service.Id })" 
+                                                   class="nav-link inline-flex items-center px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-md transition-colors">
+                                                    <i class="fas fa-trash mr-1"></i>
+                                                    Delete
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <i class="fas fa-users text-slate-400 text-6xl mb-4"></i>
+                    <h3 class="text-slate-900 text-lg font-medium mb-2">No users found</h3>
+                    <p class="text-slate-600 mb-6">Get started by creating your first user account.</p>
+                    <a href="@Url.Action("Create", "Users", new { area = "Admin" })" 
+                       class="nav-link inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Add First User
+                    </a>
+                </div>
+            }
+        </div>
+
+</div>

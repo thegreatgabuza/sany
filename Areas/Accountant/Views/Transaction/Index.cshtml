@@ -1,0 +1,615 @@
+@using Cascade.Fx9Kl2
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Aq3Zh4Service> UserManager
+@model List<Pz7Vm5Protocol>
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="javascript:history.back()"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">All Transactions</h1>
+                        <p class="text-slate-600">Manage journal entries and financial transactions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Dashboard", new { area = "Accountant" })" 
+                   class="inline-flex items-center px-4 py-2 bg-aquaMist/20 hover:bg-aquaMist/30 text-cascadeBlue rounded-lg transition-colors">
+                    <i class="fas fa-tachometer-alt mr-2"></i>
+                    Dashboard
+                </a>
+                <a href="@Url.Action("Create", "Transaction", new { area = "Accountant" })" 
+                   class="inline-flex items-center px-6 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white rounded-lg transition-colors font-medium">
+                    <i class="fas fa-plus mr-2"></i>
+                    New Transaction
+                </a>
+                <a href="@Url.Action("MyTransactions", "Reports")" 
+                   class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+                    <i class="fas fa-list mr-2"></i>
+                    My Transactions
+                </a>
+                <a href="@Url.Action("GeneralJournal", "Reports", new { area = "" })"  
+                   class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+                    <i class="fas fa-book mr-2"></i>
+                    Journal
+                </a>
+            </div>
+        </div>
+    </div>
+
+     @if (ViewBag.IsCorrection == true)
+    {
+        <div class="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <div class="flex items-center">
+                <i class="fas fa-info-circle text-orange-600 mr-3"></i>
+                <div>
+                    <h3 class="text-orange-800 font-bold">Creating Correcting Entry</h3>
+                    <p class="text-orange-700 text-sm">
+                        You're creating a correcting entry that will reverse the original Pz7Vm5Protocol and create a new one.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">@TempData["Success"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">@TempData["Error"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-slate-900">Pz7Vm5Protocol History</h2>
+                <p class="text-slate-600 text-sm mt-1">View and manage all accounting transactions</p>
+            </div>
+            <div class="w-12 h-12 bg-gradient-to-br from-cascadeBlue to-aquaMist rounded-full flex items-center justify-center">
+                <i class="fas fa-exchange-alt text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Bar -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-list text-white"></i>
+                </div>
+                <div>
+                    <p class="text-slate-600 text-sm">Total Transactions</p>
+                    <p class="text-slate-900 text-xl font-bold">@Model.Count</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-calendar-day text-white"></i>
+                </div>
+                <div>
+                    <p class="text-slate-600 text-sm">This Month</p>
+                    <p class="text-slate-900 text-xl font-bold">@Model.Count(t => t.TransactionDate.Month == DateTime.Now.Month && t.TransactionDate.Year == DateTime.Now.Year)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-coins text-white"></i>
+                </div>
+                <div>
+                    <p class="text-slate-600 text-sm">Total Value</p>
+                    <p class="text-slate-900 text-xl font-bold">R @Model.SelectMany(t => t.ProcessHandlers).Sum(tl => tl.Debit).ToString("N2")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-calendar-week text-white"></i>
+                </div>
+                <div>
+                    <p class="text-slate-600 text-sm">This Week</p>
+                    <p class="text-slate-900 text-xl font-bold">@Model.Count(t => t.TransactionDate >= DateTime.Now.AddDays(-7))</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <!-- Search Box -->
+            <div class="lg:col-span-2">
+                <label for="searchInput" class="block text-sm font-medium text-slate-700 mb-2">Search Transactions</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-slate-400"></i>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search by description, reference, or amount..." 
+                           class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cascadeBlue focus:border-cascadeBlue">
+                </div>
+            </div>
+
+            <!-- Date Filter -->
+            <div>
+                <label for="dateFilter" class="block text-sm font-medium text-slate-700 mb-2">Date Range</label>
+                <select id="dateFilter" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cascadeBlue focus:border-cascadeBlue">
+                    <option value="">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="quarter">This Quarter</option>
+                    <option value="year">This Year</option>
+                </select>
+            </div>
+
+            <!-- Amount Filter -->
+            <div>
+                <label for="amountFilter" class="block text-sm font-medium text-slate-700 mb-2">Amount Range</label>
+                <select id="amountFilter" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cascadeBlue focus:border-cascadeBlue">
+                    <option value="">All Amounts</option>
+                    <option value="0-100">R0 - R100</option>
+                    <option value="100-500">R100 - R500</option>
+                    <option value="500-1000">R500 - R1,000</option>
+                    <option value="1000-5000">R1,000 - R5,000</option>
+                    <option value="5000+">R5,000+</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Filter Results Info -->
+        <div class="mt-4 flex items-center justify-between">
+            <div id="filterResults" class="text-sm text-slate-600">
+                Showing all @Model.Count transactions
+            </div>
+            <button id="clearFilters" class="text-sm text-cascadeBlue hover:text-cascadeBlue/80 font-medium">
+                Clear all filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        @if (Model.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="text-left py-4 px-6 text-slate-700 font-medium">Date</th>
+                            <th class="text-left py-4 px-6 text-slate-700 font-medium">Type</th>
+                            <th class="text-left py-4 px-6 text-slate-700 font-medium">Description</th>
+                            <th class="text-left py-4 px-6 text-slate-700 font-medium">Reference</th>
+                            <th class="text-right py-4 px-6 text-slate-700 font-medium">Amount (ZAR)</th>
+                            <th class="text-center py-4 px-6 text-slate-700 font-medium">Accounts</th>
+                            <th class="text-center py-4 px-6 text-slate-700 font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200" id="transactionTableBody">
+                        @{
+                            var currentUser = await UserManager.GetUserAsync(User);
+                            var currentUserId = currentUser?.Id;
+                        }
+                        @foreach (var Pz7Vm5Protocol in Model)
+                        {
+                            <tr class="hover:bg-slate-50 transition-colors Pz7Vm5Protocol-row" 
+                                data-description="@Pz7Vm5Protocol.Description.ToLower()" 
+                                data-reference="@(Pz7Vm5Protocol.ReferenceNo?.ToLower() ?? "")"
+                                data-amount="@Pz7Vm5Protocol.ProcessHandlers.Sum(tl => tl.Debit)"
+                                data-date="@Pz7Vm5Protocol.TransactionDate.ToString("yyyy-MM-dd")">
+                                <td class="py-4 px-6">
+                                    <div class="flex flex-col">
+                                        <span class="text-slate-900 font-medium">@Pz7Vm5Protocol.TransactionDate.ToString("MMM dd")</span>
+                                        <span class="text-slate-500 text-sm">@Pz7Vm5Protocol.TransactionDate.ToString("yyyy")</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    @if (Pz7Vm5Protocol.IsReversal)
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-undo mr-1"></i>Reversal
+                                        </span>
+                                    }
+                                    else if (Pz7Vm5Protocol.IsCorrection)
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                            <i class="fas fa-edit mr-1"></i>Correction
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-check mr-1"></i>Normal
+                                        </span>
+                                    }
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="flex flex-col">
+                                        <span class="text-slate-900 font-medium">@Pz7Vm5Protocol.Description</span>
+                                        <span class="text-slate-500 text-sm">@Pz7Vm5Protocol.ProcessHandlers.Count lines</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    @if (!string.IsNullOrEmpty(Pz7Vm5Protocol.ReferenceNo))
+                                    {
+                                        <span class="px-2 py-1 bg-cascadeBlue/10 text-cascadeBlue rounded text-sm font-mono">
+                                            @Pz7Vm5Protocol.ReferenceNo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-slate-400 text-sm">—</span>
+                                    }
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <div class="flex flex-col">
+                        <span class="text-slate-900 font-bold">R @Pz7Vm5Protocol.ProcessHandlers.Sum(tl => tl.Debit).ToString("N2")</span>
+                        <span class="text-slate-500 text-sm">Total</span>
+                    </div>
+                </td>
+                <td class="py-4 px-6">
+                    <div class="flex flex-wrap gap-1 justify-center">
+                        @foreach (var line in Pz7Vm5Protocol.ProcessHandlers.Take(3))
+                        {
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs">
+                                @(line.Qw8Rt5Entity?.AccountName ?? "Unknown")
+                            </span>
+                        }
+                        @if (Pz7Vm5Protocol.ProcessHandlers.Count > 3)
+                        {
+                            <span class="px-2 py-1 bg-slate-200 text-slate-600 rounded text-xs">
+                                +@(Pz7Vm5Protocol.ProcessHandlers.Count - 3)
+                            </span>
+                        }
+                    </div>
+                </td>
+                <td class="py-4 px-6">
+                    <div class="flex justify-center space-x-2">
+                        <a href="@Url.Action("Details", "Transaction", new { area = "Accountant", id = Pz7Vm5Protocol.TransactionId })" 
+                           class="w-8 h-8 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white rounded-lg flex items-center justify-center transition-colors" 
+                           title="View Details">
+                            <i class="fas fa-eye text-sm"></i>
+                        </a>
+                        @{
+                            var canDelete = currentUserId != null && 
+                                          Pz7Vm5Protocol.EnteredByUserId == currentUserId && 
+                                          Pz7Vm5Protocol.TransactionDate.Date == DateTime.Today &&
+                                          !Pz7Vm5Protocol.IsCorrection && 
+                                          !Pz7Vm5Protocol.IsReversal;
+                            
+                            var deleteTooltip = canDelete ? "Delete Pz7Vm5Protocol" : 
+                                              Pz7Vm5Protocol.EnteredByUserId != currentUserId ? "Only the person who entered this Pz7Vm5Protocol can delete it" :
+                                              Pz7Vm5Protocol.TransactionDate.Date != DateTime.Today ? "Can only delete transactions from today" :
+                                              Pz7Vm5Protocol.IsCorrection || Pz7Vm5Protocol.IsReversal ? "Correction and reversal transactions cannot be deleted" :
+                                              "Cannot delete this Pz7Vm5Protocol";
+                        }
+                        @if (canDelete)
+                        {
+                            <button onclick="confirmDelete(@Pz7Vm5Protocol.TransactionId, '@Pz7Vm5Protocol.Description')" 
+                                    class="w-8 h-8 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center transition-colors" 
+                                    title="@deleteTooltip">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="w-8 h-8 bg-gray-300 text-gray-500 rounded-lg flex items-center justify-center cursor-not-allowed" 
+                                 title="@deleteTooltip">
+                                <i class="fas fa-lock text-sm"></i>
+                            </div>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+
+<!-- No Results Message (Hidden by default) -->
+<div id="noResultsMessage" class="text-center py-16 hidden">
+    <i class="fas fa-search text-slate-400 text-6xl mb-6"></i>
+    <h3 class="text-xl font-bold text-slate-900 mb-2">No transactions found</h3>
+    <p class="text-slate-600 mb-6">Try adjusting your search criteria or filters.</p>
+    <button onclick="clearAllFilters()" class="inline-flex items-center px-6 py-3 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white rounded-lg transition-colors font-medium">
+        <i class="fas fa-times mr-2"></i>Clear Filters
+    </button>
+</div>
+}
+else
+{
+    <div class="p-12 text-center">
+        <i class="fas fa-inbox text-slate-400 text-6xl mb-4"></i>
+        <h3 class="text-slate-900 text-xl font-bold mb-2">No Transactions Found</h3>
+        <p class="text-slate-600 mb-6">Start by creating your first Pz7Vm5Protocol entry</p>
+        <a href="@Url.Action("Create", "Transaction", new { area = "Accountant" })" 
+           class="inline-flex items-center px-6 py-3 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white rounded-lg transition-colors font-medium">
+            <i class="fas fa-plus mr-2"></i>Create First Transaction
+        </a>
+    </div>
+}
+</div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4">
+        <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-exclamation-triangle text-white"></i>
+            </div>
+            <div>
+                <h3 class="text-slate-900 text-lg font-bold">Delete Pz7Vm5Protocol</h3>
+                <p class="text-slate-600 text-sm">This action cannot be undone</p>
+            </div>
+        </div>
+        <p class="text-slate-600 mb-6">Are you sure you want to delete "<span id="deleteTransactionName" class="text-slate-900 font-medium"></span>"?</p>
+        <div class="flex justify-end space-x-3">
+            <button onclick="closeDeleteModal()" 
+                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+                Cancel
+            </button>
+            <form id="deleteForm" method="post" class="inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" 
+                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+@section Scripts {
+    <script>
+        let allTransactions = [];
+        let filteredTransactions = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the Pz7Vm5Protocol data
+            initializeTransactions();
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        function initializeTransactions() {
+            const rows = document.querySelectorAll('.Pz7Vm5Protocol-row');
+            allTransactions = Array.from(rows).map(row => ({
+                element: row,
+                description: row.dataset.description,
+                reference: row.dataset.reference,
+                amount: parseFloat(row.dataset.amount),
+                date: new Date(row.dataset.date)
+            }));
+            filteredTransactions = [...allTransactions];
+        }
+
+        function setupEventListeners() {
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(applyFilters, 300));
+            }
+
+            // Date filter
+            const dateFilter = document.getElementById('dateFilter');
+            if (dateFilter) {
+                dateFilter.addEventListener('change', applyFilters);
+            }
+
+            // Amount filter
+            const amountFilter = document.getElementById('amountFilter');
+            if (amountFilter) {
+                amountFilter.addEventListener('change', applyFilters);
+            }
+
+            // Clear filters
+            const clearFilters = document.getElementById('clearFilters');
+            if (clearFilters) {
+                clearFilters.addEventListener('click', clearAllFilters);
+            }
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const dateRange = document.getElementById('dateFilter')?.value || '';
+            const amountRange = document.getElementById('amountFilter')?.value || '';
+
+            filteredTransactions = allTransactions.filter(Pz7Vm5Protocol => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    Pz7Vm5Protocol.description.includes(searchTerm) ||
+                    Pz7Vm5Protocol.reference.includes(searchTerm) ||
+                    Pz7Vm5Protocol.amount.toString().includes(searchTerm);
+
+                // Date filter
+                const matchesDate = !dateRange || isInDateRange(Pz7Vm5Protocol.date, dateRange);
+
+                // Amount filter
+                const matchesAmount = !amountRange || isInAmountRange(Pz7Vm5Protocol.amount, amountRange);
+
+                return matchesSearch && matchesDate && matchesAmount;
+            });
+
+            updateDisplay();
+            updateFilterResults();
+        }
+
+        function isInDateRange(date, range) {
+            const today = new Date();
+            const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            
+            switch (range) {
+                case 'today':
+                    return date >= startOfToday;
+                case 'week':
+                    const weekStart = new Date(startOfToday);
+                    weekStart.setDate(startOfToday.getDate() - startOfToday.getDay());
+                    return date >= weekStart;
+                case 'month':
+                    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                    return date >= monthStart;
+                case 'quarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    const quarterStart = new Date(today.getFullYear(), quarter * 3, 1);
+                    return date >= quarterStart;
+                case 'year':
+                    const yearStart = new Date(today.getFullYear(), 0, 1);
+                    return date >= yearStart;
+                default:
+                    return true;
+            }
+        }
+
+        function isInAmountRange(amount, range) {
+            switch (range) {
+                case '0-100':
+                    return amount >= 0 && amount <= 100;
+                case '100-500':
+                    return amount > 100 && amount <= 500;
+                case '500-1000':
+                    return amount > 500 && amount <= 1000;
+                case '1000-5000':
+                    return amount > 1000 && amount <= 5000;
+                case '5000+':
+                    return amount > 5000;
+                default:
+                    return true;
+            }
+        }
+
+        function updateDisplay() {
+            const tableBody = document.getElementById('transactionTableBody');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            
+            if (!tableBody || !noResultsMessage) return;
+
+            // Hide all rows first
+            allTransactions.forEach(Pz7Vm5Protocol => {
+                Pz7Vm5Protocol.element.style.display = 'none';
+            });
+
+            if (filteredTransactions.length === 0) {
+                // Show no results message
+                tableBody.style.display = 'none';
+                noResultsMessage.classList.remove('hidden');
+            } else {
+                // Show filtered rows
+                tableBody.style.display = '';
+                noResultsMessage.classList.add('hidden');
+                
+                filteredTransactions.forEach(Pz7Vm5Protocol => {
+                    Pz7Vm5Protocol.element.style.display = '';
+                });
+            }
+        }
+
+        function updateFilterResults() {
+            const filterResults = document.getElementById('filterResults');
+            if (filterResults) {
+                const total = allTransactions.length;
+                const filtered = filteredTransactions.length;
+                
+                if (filtered === total) {
+                    filterResults.textContent = `Showing all ${total} transactions`;
+                } else {
+                    filterResults.textContent = `Showing ${filtered} of ${total} transactions`;
+                }
+            }
+        }
+
+        function clearAllFilters() {
+            // Clear all filter inputs
+            const searchInput = document.getElementById('searchInput');
+            const dateFilter = document.getElementById('dateFilter');
+            const amountFilter = document.getElementById('amountFilter');
+            
+            if (searchInput) searchInput.value = '';
+            if (dateFilter) dateFilter.value = '';
+            if (amountFilter) amountFilter.value = '';
+            
+            // Reset filtered transactions
+            filteredTransactions = [...allTransactions];
+            updateDisplay();
+            updateFilterResults();
+        }
+
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Existing delete modal functions
+        function confirmDelete(transactionId, description) {
+            document.getElementById('deleteTransactionName').textContent = description;
+            document.getElementById('deleteForm').action = '@Url.Action("Delete", "Pz7Vm5Protocol", new { area = "Accountant" })' + '/' + transactionId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    </script>
+}

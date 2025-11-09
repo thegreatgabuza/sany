@@ -1,0 +1,233 @@
+@model Qw8Rt5Entity
+@{
+    ViewData["Title"] = "Account Details";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Accounts", new { area = "Admin" })"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center
+                                @(Model.Mx9Qw7Type == Mx9Qw7Type.Asset ? "bg-green-100" :
+                                  Model.Mx9Qw7Type == Mx9Qw7Type.Liability ? "bg-red-100" :
+                                  Model.Mx9Qw7Type == Mx9Qw7Type.Equity ? "bg-purple-100" :
+                                  Model.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "bg-emerald-100" : "bg-orange-100")">
+                        <i class="fas @(Model.Mx9Qw7Type == Mx9Qw7Type.Asset ? "fa-building text-green-600" :
+                                       Model.Mx9Qw7Type == Mx9Qw7Type.Liability ? "fa-credit-card text-red-600" :
+                                       Model.Mx9Qw7Type == Mx9Qw7Type.Equity ? "fa-balance-scale text-purple-600" :
+                                       Model.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "fa-arrow-up text-emerald-600" : "fa-arrow-down text-orange-600") text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">@Model.AccountName</h1>
+                        <p class="text-slate-600">@Model.Mx9Qw7Type Account</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="@Url.Action("Edit", "Accounts", new { area = "Admin", id = Model.AccountId })" 
+                   class="inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                    <i class="fas fa-edit mr-2"></i>
+                    Edit Account
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Qw8Rt5Entity Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-hashtag text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-600">Account ID</p>
+                    <p class="text-2xl font-bold text-slate-900">@Model.AccountId.ToString("D4")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-plus text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-600">Total Debits</p>
+                    <p class="text-2xl font-bold text-slate-900">@ViewBag.TotalDebits.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-minus text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-600">Total Credits</p>
+                    <p class="text-2xl font-bold text-slate-900">@ViewBag.TotalCredits.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-balance-scale text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-600">Net Balance</p>
+                    <p class="text-2xl font-bold @(ViewBag.Balance >= 0 ? "text-green-600" : "text-red-600")">
+                        @ViewBag.Balance.ToString("C")
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Qw8Rt5Entity Information -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div class="p-6 border-b border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-900">Account Information</h2>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Account Name</label>
+                        <p class="text-slate-900 bg-slate-50 px-3 py-2 rounded-lg">@Model.AccountName</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Account Type</label>
+                        <div class="flex items-center">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                         @(Model.Mx9Qw7Type == Mx9Qw7Type.Asset ? "bg-green-100 text-green-800" :
+                                           Model.Mx9Qw7Type == Mx9Qw7Type.Liability ? "bg-red-100 text-red-800" :
+                                           Model.Mx9Qw7Type == Mx9Qw7Type.Equity ? "bg-purple-100 text-purple-800" :
+                                           Model.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "bg-emerald-100 text-emerald-800" : "bg-orange-100 text-orange-800")">
+                                <i class="fas @(Model.Mx9Qw7Type == Mx9Qw7Type.Asset ? "fa-building" :
+                                               Model.Mx9Qw7Type == Mx9Qw7Type.Liability ? "fa-credit-card" :
+                                               Model.Mx9Qw7Type == Mx9Qw7Type.Equity ? "fa-balance-scale" :
+                                               Model.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "fa-arrow-up" : "fa-arrow-down") mr-2"></i>
+                                @Model.Mx9Qw7Type
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Account ID</label>
+                        <p class="text-slate-900 bg-slate-50 px-3 py-2 rounded-lg font-mono">@Model.AccountId.ToString("D4")</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Hx7Tz3Data</label>
+                        <p class="text-slate-900 bg-slate-50 px-3 py-2 rounded-lg">@Model.Hx7Tz3Data?.CompanyName</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Pz7Vm5Protocol Count</label>
+                        <p class="text-slate-900 bg-slate-50 px-3 py-2 rounded-lg">@ViewBag.TransactionCount transactions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div class="p-6 border-b border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-slate-900">Recent Transactions</h2>
+                        <a href="@Url.Action("AccountLedger", "Reports", new { area = "", accountId = Model.AccountId })" 
+                           class="inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-md transition-colors">
+                            <i class="fas fa-external-link-alt mr-2"></i>
+                            View Full Ledger
+                        </a>
+                    </div>
+                </div>
+
+                @if (Model.ProcessHandlers.Any())
+                {
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Date</th>
+                                    <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Description</th>
+                                    <th class="text-right py-3 px-6 text-slate-700 font-medium text-sm">Debit</th>
+                                    <th class="text-right py-3 px-6 text-slate-700 font-medium text-sm">Credit</th>
+                                    <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Reference</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                @foreach (var Sx2Dn8Gateway in Model.ProcessHandlers.OrderByDescending(tl => tl.Pz7Vm5Protocol.TransactionDate).Take(10))
+                                {
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="py-3 px-6 text-sm text-slate-900">
+                                            @Sx2Dn8Gateway.Pz7Vm5Protocol.TransactionDate.ToString("MMM dd, yyyy")
+                                        </td>
+                                        <td class="py-3 px-6 text-sm text-slate-900">
+                                            @Sx2Dn8Gateway.Pz7Vm5Protocol.Description
+                                        </td>
+                                        <td class="py-3 px-6 text-sm text-right">
+                                            @if (Sx2Dn8Gateway.Debit > 0)
+                                            {
+                                                <span class="text-green-600 font-medium">@Sx2Dn8Gateway.Debit.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-slate-400">-</span>
+                                            }
+                                        </td>
+                                        <td class="py-3 px-6 text-sm text-right">
+                                            @if (Sx2Dn8Gateway.Credit > 0)
+                                            {
+                                                <span class="text-red-600 font-medium">@Sx2Dn8Gateway.Credit.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-slate-400">-</span>
+                                            }
+                                        </td>
+                                        <td class="py-3 px-6 text-sm text-slate-600">
+                                            @(string.IsNullOrEmpty(Sx2Dn8Gateway.Pz7Vm5Protocol.ReferenceNo) ? "-" : Sx2Dn8Gateway.Pz7Vm5Protocol.ReferenceNo)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (Model.ProcessHandlers.Count > 10)
+                    {
+                        <div class="p-4 text-center border-t border-slate-200">
+                            <p class="text-sm text-slate-600">
+                                Showing recent 10 transactions. 
+                                <a href="@Url.Action("AccountLedger", "Reports", new { area = "", accountId = Model.AccountId })" 
+                                   class="text-cascadeBlue hover:underline">View all @Model.ProcessHandlers.Count transactions</a>
+                            </p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-12">
+                        <i class="fas fa-receipt text-slate-400 text-4xl mb-4"></i>
+                        <h3 class="text-slate-900 text-lg font-medium mb-2">No transactions yet</h3>
+                        <p class="text-slate-600">This Account hasn't been used in any transactions.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>

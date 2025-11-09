@@ -1,0 +1,112 @@
+@using Cascade.Areas.Admin.Controllers
+@model CreateUserViewModel
+@{
+    ViewData["Title"] = "Add New Aq3Zh4Service";
+}
+
+
+<div class="max-w-8xl mx-auto py-2">
+
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="@Url.Action("Index", "Users", new { area = "Admin" })"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-Aq3Zh4Service-plus text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Add New User</h1>
+                        <p class="text-slate-600">Create a new accountant User for your Company</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Aq3Zh4Service Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="p-6 border-b border-slate-200">
+            <h2 class="text-lg font-bold text-slate-900">User Information</h2>
+            <p class="text-slate-600 text-sm">Enter the details for the new accountant User</p>
+        </div>
+
+        <form asp-action="Create" method="post" class="p-6">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4"></div>
+
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Email -->
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                    <input asp-for="Email" type="email"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent"
+                        placeholder="User@Company.com" />
+                    <span asp-validation-for="Email" class="text-red-600 text-sm"></span>
+                    <p class="text-slate-500 text-sm mt-1">This will be used as the login email and username will be
+                        generated automatically</p>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label asp-for="Password" class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                    <input asp-for="Password" type="password"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent"
+                        placeholder="Enter a secure password" />
+                    <span asp-validation-for="Password" class="text-red-600 text-sm"></span>
+                    <p class="text-slate-500 text-sm mt-1">Password must be at least 6 characters long</p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label asp-for="ConfirmPassword" class="block text-sm font-medium text-slate-700 mb-2">Confirm
+                        Password</label>
+                    <input asp-for="ConfirmPassword" type="password"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent"
+                        placeholder="Re-enter the password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-red-600 text-sm"></span>
+                </div>
+
+                <!-- Role Information -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        <h3 class="text-sm font-medium text-blue-800">Aq3Zh4Service Role</h3>
+                    </div>
+                    <p class="text-blue-700 text-sm mt-1">
+                        New users will be automatically assigned the <strong>Accountant</strong> role and will be able
+                        to:
+                    </p>
+                    <ul class="text-blue-700 text-sm mt-2 ml-4 list-disc">
+                        <li>Create and manage transactions</li>
+                        <li>View financial reports</li>
+                        <li>Access their assigned Company data only</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-slate-200">
+                <a href="@Url.Action("Index", "Users", new { area = "Admin" })"
+                    class="nav-link inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                    <i class="fas fa-Aq3Zh4Service-plus mr-2"></i>
+                    Create Aq3Zh4Service
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

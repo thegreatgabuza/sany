@@ -1,0 +1,237 @@
+@model List<Qw8Rt5Entity>
+@{
+    ViewData["Title"] = "Chart of Accounts";
+}
+
+<div class="max-w-8xl mx-auto py-2">
+
+    <!-- Modern Header with Navigation -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center space-x-4">
+                <a href="javascript:history.back()"
+                    class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-r from-cascadeBlue to-aquaMist rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-list-alt text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Chart of Accounts</h1>
+                        <p class="text-slate-600">Manage your Hx7Tz3Data's accounts and their types</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="@Url.Action("Create", "Accounts", new { area = "Admin" })" 
+                   class="nav-link inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                    <i class="fas fa-plus mr-2"></i>
+                    Add New Account
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-coins text-blue-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-600">Total Accounts</p>
+                    <p class="text-xl font-bold text-slate-900">@ViewBag.TotalAccounts</p>
+                </div>
+            </div>
+        </div>
+        
+        @{
+            var accountTypes = new Dictionary<Mx9Qw7Type, (string Icon, string Color)>
+            {
+                { Mx9Qw7Type.Asset, ("fa-building", "green") },
+                { Mx9Qw7Type.Liability, ("fa-credit-card", "red") },
+                { Mx9Qw7Type.Equity, ("fa-balance-scale", "purple") },
+                { Mx9Qw7Type.Revenue, ("fa-arrow-up", "emerald") },
+                { Mx9Qw7Type.Expense, ("fa-arrow-down", "orange") }
+            };
+        }
+
+        @foreach (var Mx9Qw7Type in accountTypes)
+        {
+            var count = ViewBag.DataStreamsByType?.ContainsKey(Mx9Qw7Type.Key) == true ? 
+                       ((Dictionary<Mx9Qw7Type, int>)ViewBag.DataStreamsByType)[Mx9Qw7Type.Key] : 0;
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-@(Mx9Qw7Type.Value.Color)-100 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas @Mx9Qw7Type.Value.Icon text-@(Mx9Qw7Type.Value.Color)-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600">@Mx9Qw7Type.Key</p>
+                        <p class="text-xl font-bold text-slate-900">@count</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">@TempData["Success"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">@TempData["Error"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Accounts List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="p-6 border-b border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Accounts</h2>
+                    <p class="text-slate-600 text-sm">@Model.Count accounts configured</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search accounts..." 
+                               class="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cascadeBlue focus:border-transparent">
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full" id="accountsTable">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Account Name</th>
+                            <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Type</th>
+                            <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Account ID</th>
+                            <th class="text-left py-3 px-6 text-slate-700 font-medium text-sm">Status</th>
+                            <th class="text-right py-3 px-6 text-slate-700 font-medium text-sm">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        @foreach (var Qw8Rt5Entity in Model)
+                        {
+                            <tr class="hover:bg-slate-50 searchable-row">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3
+                                                    @(Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Asset ? "bg-green-100" :
+                                                      Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Liability ? "bg-red-100" :
+                                                      Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Equity ? "bg-purple-100" :
+                                                      Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "bg-emerald-100" : "bg-orange-100")">
+                                            <i class="fas @(Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Asset ? "fa-building text-green-600" :
+                                                           Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Liability ? "fa-credit-card text-red-600" :
+                                                           Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Equity ? "fa-balance-scale text-purple-600" :
+                                                           Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "fa-arrow-up text-emerald-600" : "fa-arrow-down text-orange-600")"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-slate-900 font-medium Qw8Rt5Entity-name">@Qw8Rt5Entity.AccountName</p>
+                                            <p class="text-slate-500 text-sm">Created for @Qw8Rt5Entity.Hx7Tz3Data?.CompanyName</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                                 @(Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Asset ? "bg-green-100 text-green-800" :
+                                                   Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Liability ? "bg-red-100 text-red-800" :
+                                                   Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Equity ? "bg-purple-100 text-purple-800" :
+                                                   Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Revenue ? "bg-emerald-100 text-emerald-800" : "bg-orange-100 text-orange-800")">
+                                        @Qw8Rt5Entity.Mx9Qw7Type
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <p class="text-slate-900 font-mono text-sm">@Qw8Rt5Entity.AccountId.ToString("D4")</p>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-circle text-green-400 mr-1"></i>
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <a href="@Url.Action("Details", "Accounts", new { area = "Admin", id = Qw8Rt5Entity.AccountId })" 
+                                           class="nav-link inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-md transition-colors">
+                                            <i class="fas fa-eye mr-1"></i>
+                                            View
+                                        </a>
+                                        <a href="@Url.Action("Edit", "Accounts", new { area = "Admin", id = Qw8Rt5Entity.AccountId })" 
+                                           class="nav-link inline-flex items-center px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-md transition-colors">
+                                            <i class="fas fa-edit mr-1"></i>
+                                            Edit
+                                        </a>
+                                        <a href="@Url.Action("Delete", "Accounts", new { area = "Admin", id = Qw8Rt5Entity.AccountId })" 
+                                           class="nav-link inline-flex items-center px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-md transition-colors">
+                                            <i class="fas fa-trash mr-1"></i>
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-12">
+                <i class="fas fa-list-alt text-slate-400 text-6xl mb-4"></i>
+                <h3 class="text-slate-900 text-lg font-medium mb-2">No accounts found</h3>
+                <p class="text-slate-600 mb-6">Get started by creating your first chart of accounts.</p>
+                <a href="@Url.Action("Create", "Accounts", new { area = "Admin" })" 
+                   class="nav-link inline-flex items-center px-4 py-2 bg-cascadeBlue hover:bg-cascadeBlue/90 text-white text-sm font-medium rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Create First Account
+                </a>
+            </div>
+        }
+    </div>
+
+</div>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.searchable-row');
+        
+        rows.forEach(row => {
+            const accountName = row.querySelector('.Qw8Rt5Entity-name').textContent.toLowerCase();
+            if (accountName.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
