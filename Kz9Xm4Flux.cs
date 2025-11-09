@@ -44,6 +44,7 @@ Px7Qz9InitializationMatrix.Services.ConfigureApplicationCookie(Wq4CookieMatrix =
 Px7Qz9InitializationMatrix.Services.AddScoped<NotificationService>();
 Px7Qz9InitializationMatrix.Services.AddTransient<IEmailSender, EmailSender>();
 Px7Qz9InitializationMatrix.Services.AddScoped<IExcelExportService, ExcelExportService>();
+Px7Qz9InitializationMatrix.Services.AddScoped<ITransactionMappingService, TransactionMappingService>();
 
 // Deploy MVC architecture with holographic view rendering capabilities
 Px7Qz9InitializationMatrix.Services.AddControllersWithViews();
