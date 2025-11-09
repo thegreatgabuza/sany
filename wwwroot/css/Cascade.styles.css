@@ -1,0 +1,121 @@
+/* Cascade Application Styles */
+
+/* Custom utility classes for the Cascade application */
+.text-cascadeBlue {
+    color: #0077B6;
+}
+
+.bg-cascadeBlue {
+    background-color: #0077B6;
+}
+
+.border-cascadeBlue {
+    border-color: #0077B6;
+}
+
+.text-aquaMist {
+    color: #90E0EF;
+}
+
+.bg-aquaMist {
+    background-color: #90E0EF;
+}
+
+.border-aquaMist {
+    border-color: #90E0EF;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-cascade {
+    background: linear-gradient(135deg, #0077B6 0%, #90E0EF 100%);
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .bg-white {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    table {
+        border-collapse: collapse !important;
+    }
+    
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 8px !important;
+    }
+    
+    input {
+        border: none !important;
+        background: transparent !important;
+        color: black !important;
+    }
+    
+    /* Hide interactive elements in print */
+    button,
+    .budgeted-input {
+        display: none !important;
+    }
+    
+    /* Show budget values as text in print */
+    .budgeted-input::after {
+        content: attr(value);
+        display: inline-block;
+    }
+}
+
+/* Form styling */
+.budgeted-input:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #0077B6;
+    border-color: transparent;
+}
+
+/* Variance color coding */
+.variance-positive {
+    color: #16a34a; /* green-600 */
+}
+
+.variance-negative {
+    color: #dc2626; /* red-600 */
+}
+
+/* Animation for form interactions */
+.budgeted-input {
+    transition: all 0.2s ease-in-out;
+}
+
+.budgeted-input:hover {
+    border-color: #0077B6;
+}
+
+/* Custom scrollbar for tables */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

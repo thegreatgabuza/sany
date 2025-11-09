@@ -1,0 +1,44 @@
+/* Cascade Site Styles */
+
+.print-mode .no-print {
+    display: none !important;
+}
+
+.print-mode {
+    background: white !important;
+}
+
+.print-mode .bg-white {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+}
+
+.print-mode table {
+    border-collapse: collapse;
+}
+
+.print-mode th, .print-mode td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+}
+
+.print-mode .budgeted-input {
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Loading indicators */
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Form improvements */
+.budgeted-input:focus {
+    box-shadow: 0 0 0 2px rgba(0, 119, 182, 0.1);
+}
+
+/* Animation for variance changes */
+.variance-cell {
+    transition: color 0.3s ease;
+}
