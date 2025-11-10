@@ -22,6 +22,74 @@ namespace Cascade.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Cascade.Fx9Kl2.AgeAnalysisRecord", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
+
+                    b.Property<string>("CalculatedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CalculatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CurrentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Days120Plus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Days30Plus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Days60Plus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Days90Plus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FutureAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalAllocated")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalOverdue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnallocatedPayments")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("RecordId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("AgeAnalysisRecords");
+                });
+
             modelBuilder.Entity("Cascade.Fx9Kl2.Aq3Zh4Service", b =>
                 {
                     b.Property<string>("Id")
@@ -93,6 +161,72 @@ namespace Cascade.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Cascade.Fx9Kl2.FeeInvoice", b =>
+                {
+                    b.Property<int>("InvoiceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceId"));
+
+                    b.Property<decimal>("AmountOutstanding")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("InvoiceAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("InvoiceStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("InvoiceId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("FeeInvoices");
                 });
 
             modelBuilder.Entity("Cascade.Fx9Kl2.Hx7Tz3Data", b =>
@@ -245,11 +379,32 @@ namespace Cascade.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ExtractedDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("InvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InvoiceNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte[]>("InvoicePdfData")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<bool>("IsCorrection")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsReversal")
                         .HasColumnType("bit");
+
+                    b.Property<string>("OriginalFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("PdfUploadedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ReferenceNo")
                         .HasMaxLength(50)
@@ -258,8 +413,16 @@ namespace Cascade.Migrations
                     b.Property<int?>("ReversalTransactionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("SuggestedAccountType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("VendorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("WriteOffReason")
                         .HasMaxLength(200)
@@ -312,6 +475,125 @@ namespace Cascade.Migrations
                     b.ToTable("DataStreams", (string)null);
                 });
 
+            modelBuilder.Entity("Cascade.Fx9Kl2.Student", b =>
+                {
+                    b.Property<int>("StudentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentId"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateEnrolled")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("StudentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("StudentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("TotalFeesAllocated")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("StudentId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("Cascade.Fx9Kl2.StudentPayment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<int?>("AllocatedToInvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AllocationStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("PaymentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("AllocatedToInvoiceId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentPayments");
+                });
+
             modelBuilder.Entity("Cascade.Fx9Kl2.Sx2Dn8Gateway", b =>
                 {
                     b.Property<int>("LineId")
@@ -324,9 +606,11 @@ namespace Cascade.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Credit")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Debit")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TransactionId")
@@ -527,6 +811,25 @@ namespace Cascade.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Cascade.Fx9Kl2.AgeAnalysisRecord", b =>
+                {
+                    b.HasOne("Cascade.Fx9Kl2.Hx7Tz3Data", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Cascade.Fx9Kl2.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("Cascade.Fx9Kl2.Aq3Zh4Service", b =>
                 {
                     b.HasOne("Cascade.Fx9Kl2.Hx7Tz3Data", "Hx7Tz3Data")
@@ -536,6 +839,25 @@ namespace Cascade.Migrations
                         .IsRequired();
 
                     b.Navigation("Hx7Tz3Data");
+                });
+
+            modelBuilder.Entity("Cascade.Fx9Kl2.FeeInvoice", b =>
+                {
+                    b.HasOne("Cascade.Fx9Kl2.Hx7Tz3Data", "Hx7Tz3Data")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Cascade.Fx9Kl2.Student", "Student")
+                        .WithMany("FeeInvoices")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hx7Tz3Data");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Cascade.Fx9Kl2.Jy9Xs1Buffer", b =>
@@ -612,6 +934,42 @@ namespace Cascade.Migrations
                         .IsRequired();
 
                     b.Navigation("Hx7Tz3Data");
+                });
+
+            modelBuilder.Entity("Cascade.Fx9Kl2.Student", b =>
+                {
+                    b.HasOne("Cascade.Fx9Kl2.Hx7Tz3Data", "Hx7Tz3Data")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hx7Tz3Data");
+                });
+
+            modelBuilder.Entity("Cascade.Fx9Kl2.StudentPayment", b =>
+                {
+                    b.HasOne("Cascade.Fx9Kl2.FeeInvoice", "AllocatedToInvoice")
+                        .WithMany("StudentPayments")
+                        .HasForeignKey("AllocatedToInvoiceId");
+
+                    b.HasOne("Cascade.Fx9Kl2.Hx7Tz3Data", "Hx7Tz3Data")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Cascade.Fx9Kl2.Student", "Student")
+                        .WithMany("StudentPayments")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AllocatedToInvoice");
+
+                    b.Navigation("Hx7Tz3Data");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Cascade.Fx9Kl2.Sx2Dn8Gateway", b =>
@@ -709,6 +1067,11 @@ namespace Cascade.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Cascade.Fx9Kl2.FeeInvoice", b =>
+                {
+                    b.Navigation("StudentPayments");
+                });
+
             modelBuilder.Entity("Cascade.Fx9Kl2.Hx7Tz3Data", b =>
                 {
                     b.Navigation("Accounts");
@@ -726,6 +1089,13 @@ namespace Cascade.Migrations
             modelBuilder.Entity("Cascade.Fx9Kl2.Qw8Rt5Entity", b =>
                 {
                     b.Navigation("ProcessHandlers");
+                });
+
+            modelBuilder.Entity("Cascade.Fx9Kl2.Student", b =>
+                {
+                    b.Navigation("FeeInvoices");
+
+                    b.Navigation("StudentPayments");
                 });
 #pragma warning restore 612, 618
         }

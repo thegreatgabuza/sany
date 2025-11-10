@@ -75,6 +75,52 @@
         </div>
     </div>
     
+    @* Show attached Invoice PDF if available *@
+    @if (Model.InvoicePdfData != null && Model.InvoicePdfData.Length > 0)
+    {
+        <div class="mt-4">
+            <label class="block text-slate-600 text-sm font-medium mb-2">Attached Invoice PDF</label>
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
+                        <div>
+                            <p class="font-medium text-slate-900">
+                                @{
+                                    string invoiceRef = Model.InvoiceNumber ?? Model.TransactionId.ToString();
+                                    string displayName = Model.OriginalFileName ?? $"Invoice-{invoiceRef}.pdf";
+                                }
+                                @displayName
+                            </p>
+                            <div class="text-sm text-slate-600 mt-1">
+                                <div>Invoice #: <span class="font-medium">@(Model.InvoiceNumber ?? "N/A")</span></div>
+                                <div>Vendor: <span class="font-medium">@(Model.VendorName ?? "N/A")</span></div>
+                                @if (Model.InvoiceDate.HasValue)
+                                {
+                                    <div>Invoice Date: <span class="font-medium">@Model.InvoiceDate.Value.ToString("MMM dd, yyyy")</span></div>
+                                }
+                                @if (Model.PdfUploadedAt.HasValue)
+                                {
+                                    <div>Uploaded: <span class="font-medium">@Model.PdfUploadedAt.Value.ToString("MMM dd, yyyy HH:mm")</span></div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm" 
+                                onclick="viewPdf(@Model.TransactionId)">
+                            <i class="fas fa-eye mr-2"></i>View
+                        </button>
+                        <a href="@Url.Action("DownloadInvoicePdf", "Transaction", new { area = "Accountant", id = Model.TransactionId })"
+                           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm text-center">
+                            <i class="fas fa-download mr-2"></i>Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    
     @* Show correction/reversal information if applicable *@
     @if (Model.IsCorrection || Model.IsReversal || Model.CorrectedTransactionId.HasValue)
     {
@@ -251,17 +297,59 @@
                 </a>
             }
             
-            @* Only show delete for same day transactions by the same Aq3Zh4Service *@
+            @* Only show delete for same day transactions by the same user *@
             @if (Model.TransactionDate.Date == DateTime.Today && 
                  Model.EnteredByUserId == User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) &&
                  !Model.IsCorrection && !Model.IsReversal)
             {
-                <a href="@Url.Action("Delete", "Pz7Vm5Protocol", new { area = "Accountant", id = Model.TransactionId })" 
+                <a href="@Url.Action("Delete", "Transaction", new { area = "Accountant", id = Model.TransactionId })" 
                    class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-                    <i class="fas fa-trash mr-2"></i>Delete Pz7Vm5Protocol
+                    <i class="fas fa-trash mr-2"></i>Delete Transaction
                 </a>
             }
         </div>
     </div>
 </div>
+
+<!-- PDF Viewer Modal (Issue #002) -->
+<div class="modal fade" id="pdfViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-to-r from-cascadeBlue to-aquaMist">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-file-pdf mr-2"></i>Invoice PDF Viewer
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" style="height: 600px; overflow: hidden;">
+                <iframe id="pdfFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+            <div class="modal-footer bg-slate-50 border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a id="downloadBtnModal" href="#" class="btn btn-primary">
+                    <i class="fas fa-download mr-2"></i>Download
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+</div>
+
+@section Scripts {
+    <script>
+        function viewPdf(transactionId) {
+            const pdfUrl = '@Url.Action("ViewInvoicePdf", "Transaction", new { area = "Accountant" })';
+            const downloadUrl = '@Url.Action("DownloadInvoicePdf", "Transaction", new { area = "Accountant" })';
+            
+            // Set iframe source to view PDF
+            document.getElementById('pdfFrame').src = pdfUrl + '?id=' + transactionId;
+            
+            // Update download link
+            document.getElementById('downloadBtnModal').href = downloadUrl + '?id=' + transactionId;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
+            modal.show();
+        }
+    </script>
+}

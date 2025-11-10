@@ -32,6 +32,46 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xEYXNoYm9hcmRcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/StudentPayment/CreateInvoice.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50UGF5bWVudFxDcmVhdGVJbnZvaWNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/StudentPayment/RecordPayment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50UGF5bWVudFxSZWNvcmRQYXltZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/_InvoiceTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XF9JbnZvaWNlVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Student/_PaymentTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xTdHVkZW50XF9QYXltZW50VGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Transaction/AccountLedger.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xUcmFuc2FjdGlvblxBY2NvdW50TGVkZ2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Transaction/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xUcmFuc2FjdGlvblxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -46,6 +86,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Transaction/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xUcmFuc2FjdGlvblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Transaction/MyTransactions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xUcmFuc2FjdGlvblxNeVRyYW5zYWN0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/Transaction/_AccountTransactions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWNjb3VudGFudFxWaWV3c1xUcmFuc2FjdGlvblxfQWNjb3VudFRyYW5zYWN0aW9ucy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/ACE/Pictures/Source Code/Areas/Accountant/Views/_ViewImports.cshtml]
@@ -260,6 +308,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQng0WXExXDkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/ACE/Pictures/Source Code/Views/Fx3Pq2/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRngzUHEyXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Fx3Pq2/StudentDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRngzUHEyXFN0dWRlbnREZXRhaWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Fx3Pq2/Summary.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRngzUHEyXFN1bW1hcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/ACE/Pictures/Source Code/Views/Mz7Lk9/1.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTXo3TGs5XDEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -272,8 +332,40 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_ActionButtons.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BY3Rpb25CdXR0b25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_AgingBucketBreakdown.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BZ2luZ0J1Y2tldEJyZWFrZG93bi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_DataTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9EYXRhVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_InvoiceTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9JbnZvaWNlVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/ACE/Pictures/Source Code/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_PaymentTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QYXltZW50VGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_StudentForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TdHVkZW50Rm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_StudentInfoCard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TdHVkZW50SW5mb0NhcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Views/Shared/_SummaryCard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TdW1tYXJ5Q2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/ACE/Pictures/Source Code/Views/Shared/_ValidationScriptsPartial.cshtml]
@@ -306,4 +398,16 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/ACE/Pictures/Source Code/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Zr9Kq6/Views/1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = WnI5S3E2XFZpZXdzXDEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Zr9Kq6/Views/2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = WnI5S3E2XFZpZXdzXDIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACE/Pictures/Source Code/Zr9Kq6/Views/3.cshtml]
+build_metadata.AdditionalFiles.TargetPath = WnI5S3E2XFZpZXdzXDMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

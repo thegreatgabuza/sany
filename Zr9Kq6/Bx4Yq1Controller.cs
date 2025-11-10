@@ -467,7 +467,7 @@ namespace Cascade.Zr9Kq6
 
             financialYear ??= DateTime.Now.Year;
 
-            // Get date range for calendar year
+            // Get date range for calendar year - balance sheet shows balances as of end date
             var startDate = new DateTime(financialYear.Value, 1, 1);
             var endDate = new DateTime(financialYear.Value, 12, 31);
 
@@ -479,21 +479,115 @@ namespace Cascade.Zr9Kq6
                 .OrderByDescending(y => y)
                 .ToListAsync();
 
-            var accounts = await _context.DataStreams
-                .Include(a => a.ProcessHandlers)
-                .ThenInclude(ph => ph.Pz7Vm5Protocol)
-                .Where(a => a.CompanyId == currentUser.CompanyId)
+            // Query Asset accounts - balance = Sum(Debit - Credit) up to endDate
+            var assetData = await _context.ProcessHandlers
+                .Include(ph => ph.Qw8Rt5Entity)
+                .Include(ph => ph.Pz7Vm5Protocol)
+                .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                            ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Asset &&
+                            ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                .GroupBy(ph => ph.Qw8Rt5Entity.AccountName)
+                .Select(g => new { AccountName = g.Key, Balance = g.Sum(ph => ph.Debit - ph.Credit) })
+                .Where(x => x.Balance != 0) // Only show accounts with non-zero balances
+                .OrderBy(x => x.AccountName)
                 .ToListAsync();
 
-            // Build balance sheet view model (using placeholder for now)
+            // Query Liability accounts - balance = Sum(Credit - Debit) up to endDate
+            var liabilityData = await _context.ProcessHandlers
+                .Include(ph => ph.Qw8Rt5Entity)
+                .Include(ph => ph.Pz7Vm5Protocol)
+                .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                            ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Liability &&
+                            ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                .GroupBy(ph => ph.Qw8Rt5Entity.AccountName)
+                .Select(g => new { AccountName = g.Key, Balance = g.Sum(ph => ph.Credit - ph.Debit) })
+                .Where(x => x.Balance != 0) // Only show accounts with non-zero balances
+                .OrderBy(x => x.AccountName)
+                .ToListAsync();
+
+            // Query Equity accounts - balance = Sum(Credit - Debit) up to endDate
+            var equityData = await _context.ProcessHandlers
+                .Include(ph => ph.Qw8Rt5Entity)
+                .Include(ph => ph.Pz7Vm5Protocol)
+                .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                            ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Equity &&
+                            ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                .GroupBy(ph => ph.Qw8Rt5Entity.AccountName)
+                .Select(g => new { AccountName = g.Key, Balance = g.Sum(ph => ph.Credit - ph.Debit) })
+                .Where(x => x.Balance != 0) // Only show accounts with non-zero balances
+                .OrderBy(x => x.AccountName)
+                .ToListAsync();
+
+            // Calculate Retained Earnings (Net Income/Loss) = Revenue - Expenses up to endDate
+            var totalRevenue = await _context.ProcessHandlers
+                .Include(ph => ph.Qw8Rt5Entity)
+                .Include(ph => ph.Pz7Vm5Protocol)
+                .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                            ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Revenue &&
+                            ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                .SumAsync(ph => ph.Credit - ph.Debit);
+
+            var totalExpenses = await _context.ProcessHandlers
+                .Include(ph => ph.Qw8Rt5Entity)
+                .Include(ph => ph.Pz7Vm5Protocol)
+                .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                            ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Expense &&
+                            ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                .SumAsync(ph => ph.Debit - ph.Credit);
+
+            var retainedEarnings = totalRevenue - totalExpenses;
+
+            // Build Asset items
+            var assetItems = assetData
+                .Select(a => new BalanceSheetItem
+                {
+                    AccountName = a.AccountName,
+                    Amount = a.Balance
+                })
+                .ToList();
+
+            // Build Liability items
+            var liabilityItems = liabilityData
+                .Select(l => new BalanceSheetItem
+                {
+                    AccountName = l.AccountName,
+                    Amount = l.Balance
+                })
+                .ToList();
+
+            // Build Equity items (include Retained Earnings if non-zero)
+            var equityItems = equityData
+                .Select(e => new BalanceSheetItem
+                {
+                    AccountName = e.AccountName,
+                    Amount = e.Balance
+                })
+                .ToList();
+
+            // Add Retained Earnings to equity if it's non-zero
+            if (retainedEarnings != 0)
+            {
+                equityItems.Add(new BalanceSheetItem
+                {
+                    AccountName = "Retained Earnings",
+                    Amount = retainedEarnings
+                });
+            }
+
+            // Calculate totals
+            var totalAssets = assetItems.Sum(a => a.Amount);
+            var totalLiabilities = liabilityItems.Sum(l => l.Amount);
+            var totalEquity = equityItems.Sum(e => e.Amount);
+
+            // Build balance sheet view model
             var viewModel = new BalanceSheetViewModel
             {
-                AssetItems = new List<BalanceSheetItem>(),
-                LiabilityItems = new List<BalanceSheetItem>(),
-                EquityItems = new List<BalanceSheetItem>(),
-                TotalAssets = 0,
-                TotalLiabilities = 0,
-                TotalEquity = 0
+                AssetItems = assetItems,
+                LiabilityItems = liabilityItems,
+                EquityItems = equityItems,
+                TotalAssets = totalAssets,
+                TotalLiabilities = totalLiabilities,
+                TotalEquity = totalEquity
             };
 
             var company = await _context.SystemEntries.FirstOrDefaultAsync(c => c.CompanyId == currentUser.CompanyId);
@@ -511,6 +605,146 @@ namespace Cascade.Zr9Kq6
         public async Task<IActionResult> BalanceSheet(int? financialYear = null)
         {
             return await StatementOfFinancialPosition(financialYear);
+        }
+
+        // GET: Export Statement of Financial Position / Balance Sheet to Excel
+        [HttpGet]
+        public async Task<IActionResult> ExportBalanceSheetExcel(int? financialYear = null)
+        {
+            try
+            {
+                var userName = User.Identity?.Name;
+                var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+                if (currentUser?.CompanyId == null)
+                    return Forbid();
+
+                financialYear ??= DateTime.Now.Year;
+
+                // Get date range for calendar year - balance sheet shows balances as of end date
+                var endDate = new DateTime(financialYear.Value, 12, 31);
+
+                // Query Asset accounts - balance = Sum(Debit - Credit) up to endDate
+                var assetData = await _context.ProcessHandlers
+                    .Include(ph => ph.Qw8Rt5Entity)
+                    .Include(ph => ph.Pz7Vm5Protocol)
+                    .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                                ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Asset &&
+                                ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                    .GroupBy(ph => ph.Qw8Rt5Entity.AccountName)
+                    .Select(g => new { AccountName = g.Key, Balance = g.Sum(ph => ph.Debit - ph.Credit) })
+                    .Where(x => x.Balance != 0)
+                    .OrderBy(x => x.AccountName)
+                    .ToListAsync();
+
+                // Query Liability accounts - balance = Sum(Credit - Debit) up to endDate
+                var liabilityData = await _context.ProcessHandlers
+                    .Include(ph => ph.Qw8Rt5Entity)
+                    .Include(ph => ph.Pz7Vm5Protocol)
+                    .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                                ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Liability &&
+                                ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                    .GroupBy(ph => ph.Qw8Rt5Entity.AccountName)
+                    .Select(g => new { AccountName = g.Key, Balance = g.Sum(ph => ph.Credit - ph.Debit) })
+                    .Where(x => x.Balance != 0)
+                    .OrderBy(x => x.AccountName)
+                    .ToListAsync();
+
+                // Query Equity accounts - balance = Sum(Credit - Debit) up to endDate
+                var equityData = await _context.ProcessHandlers
+                    .Include(ph => ph.Qw8Rt5Entity)
+                    .Include(ph => ph.Pz7Vm5Protocol)
+                    .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                                ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Equity &&
+                                ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                    .GroupBy(ph => ph.Qw8Rt5Entity.AccountName)
+                    .Select(g => new { AccountName = g.Key, Balance = g.Sum(ph => ph.Credit - ph.Debit) })
+                    .Where(x => x.Balance != 0)
+                    .OrderBy(x => x.AccountName)
+                    .ToListAsync();
+
+                // Calculate Retained Earnings (Net Income/Loss) = Revenue - Expenses up to endDate
+                var totalRevenue = await _context.ProcessHandlers
+                    .Include(ph => ph.Qw8Rt5Entity)
+                    .Include(ph => ph.Pz7Vm5Protocol)
+                    .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                                ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Revenue &&
+                                ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                    .SumAsync(ph => ph.Credit - ph.Debit);
+
+                var totalExpenses = await _context.ProcessHandlers
+                    .Include(ph => ph.Qw8Rt5Entity)
+                    .Include(ph => ph.Pz7Vm5Protocol)
+                    .Where(ph => ph.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                                ph.Qw8Rt5Entity.Mx9Qw7Type == Mx9Qw7Type.Expense &&
+                                ph.Pz7Vm5Protocol.TransactionDate <= endDate)
+                    .SumAsync(ph => ph.Debit - ph.Credit);
+
+                var retainedEarnings = totalRevenue - totalExpenses;
+
+                // Build Asset items
+                var assetItems = assetData
+                    .Select(a => new BalanceSheetItem
+                    {
+                        AccountName = a.AccountName,
+                        Amount = a.Balance
+                    })
+                    .ToList();
+
+                // Build Liability items
+                var liabilityItems = liabilityData
+                    .Select(l => new BalanceSheetItem
+                    {
+                        AccountName = l.AccountName,
+                        Amount = l.Balance
+                    })
+                    .ToList();
+
+                // Build Equity items (include Retained Earnings if non-zero)
+                var equityItems = equityData
+                    .Select(e => new BalanceSheetItem
+                    {
+                        AccountName = e.AccountName,
+                        Amount = e.Balance
+                    })
+                    .ToList();
+
+                // Add Retained Earnings to equity if it's non-zero
+                if (retainedEarnings != 0)
+                {
+                    equityItems.Add(new BalanceSheetItem
+                    {
+                        AccountName = "Retained Earnings",
+                        Amount = retainedEarnings
+                    });
+                }
+
+                // Calculate totals
+                var totalAssets = assetItems.Sum(a => a.Amount);
+                var totalLiabilities = liabilityItems.Sum(l => l.Amount);
+                var totalEquity = equityItems.Sum(e => e.Amount);
+
+                // Build balance sheet view model
+                var viewModel = new BalanceSheetViewModel
+                {
+                    AssetItems = assetItems,
+                    LiabilityItems = liabilityItems,
+                    EquityItems = equityItems,
+                    TotalAssets = totalAssets,
+                    TotalLiabilities = totalLiabilities,
+                    TotalEquity = totalEquity
+                };
+
+                var company = await _context.SystemEntries.FirstOrDefaultAsync(c => c.CompanyId == currentUser.CompanyId);
+                var excelBytes = await _excelExportService.ExportStatementOfFinancialPositionAsync(viewModel, endDate, company);
+
+                return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                    $"BalanceSheet_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting balance sheet");
+                return BadRequest("Failed to export balance sheet");
+            }
         }
 
         // GET: Trial Balance
@@ -553,6 +787,55 @@ namespace Cascade.Zr9Kq6
             ViewBag.TotalCredits = totalCredits;
 
             return View("5", trialBalanceItems);
+        }
+
+        // GET: Export Trial Balance to Excel
+        [HttpGet]
+        public async Task<IActionResult> ExportTrialBalanceExcel(DateTime? asDate = null)
+        {
+            try
+            {
+                var userName = User.Identity?.Name;
+                var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+                if (currentUser?.CompanyId == null)
+                    return Forbid();
+
+                asDate ??= DateTime.Today;
+
+                // Get all transaction lines and calculate balances
+                var transactionLines = await _context.ProcessHandlers
+                    .Include(tl => tl.Qw8Rt5Entity)
+                    .Include(tl => tl.Pz7Vm5Protocol)
+                    .Where(tl => tl.Qw8Rt5Entity.CompanyId == currentUser.CompanyId &&
+                                tl.Pz7Vm5Protocol.TransactionDate <= asDate)
+                    .ToListAsync();
+
+                // Build Trial Balance items
+                var trialBalanceItems = transactionLines
+                    .GroupBy(tl => tl.Qw8Rt5Entity)
+                    .Select(g => new Lv6Cx9Item
+                    {
+                        Qw8Rt5Entity = g.Key,
+                        DebitBalance = g.Where(tl => tl.Debit > 0).Sum(tl => tl.Debit),
+                        CreditBalance = g.Where(tl => tl.Credit > 0).Sum(tl => tl.Credit)
+                    })
+                    .OrderBy(tb => tb.Qw8Rt5Entity.AccountName)
+                    .ToList();
+
+                var totalDebits = trialBalanceItems.Sum(tb => tb.DebitBalance);
+                var totalCredits = trialBalanceItems.Sum(tb => tb.CreditBalance);
+
+                var company = await _context.SystemEntries.FirstOrDefaultAsync(c => c.CompanyId == currentUser.CompanyId);
+                var excelBytes = await _excelExportService.ExportTrialBalanceAsync(trialBalanceItems, asDate.Value, company, totalDebits, totalCredits);
+
+                return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                    $"TrialBalance_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting trial balance");
+                return BadRequest("Failed to export trial balance");
+            }
         }
 
         // GET: Account Ledger

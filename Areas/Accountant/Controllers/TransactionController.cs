@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using Cascade.A1B2C3D4;
 using Cascade.Fx9Kl2;
 using Cascade.Services;
+using System.Linq;
 
 namespace Cascade.Areas.Accountant.Controllers
 {
@@ -16,12 +17,14 @@ namespace Cascade.Areas.Accountant.Controllers
         private readonly VxR4DbGate _context;
         private readonly UserManager<Aq3Zh4Service> _userManager;
         private readonly ITransactionMappingService _mappingService;
+        private readonly ILogger<TransactionController> _logger;
 
-        public TransactionController(VxR4DbGate context, UserManager<Aq3Zh4Service> userManager, ITransactionMappingService mappingService)
+        public TransactionController(VxR4DbGate context, UserManager<Aq3Zh4Service> userManager, ITransactionMappingService mappingService, ILogger<TransactionController> logger)
         {
             _context = context;
             _userManager = userManager;
             _mappingService = mappingService;
+            _logger = logger;
         }
 
         // GET: Pz7Vm5Protocol
@@ -247,7 +250,7 @@ namespace Cascade.Areas.Accountant.Controllers
         // POST: Pz7Vm5Protocol/Create (Issue #001: Simplified single account processing)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SimpleTransactionCreateViewModel viewModel)
+        public async Task<IActionResult> Create(SimpleTransactionCreateViewModel viewModel, string? InvoicePdfData = null, string? InvoiceNumber = null, string? VendorName = null, string? InvoiceDateExtracted = null)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -451,13 +454,43 @@ namespace Cascade.Areas.Accountant.Controllers
                         }
                     };
 
+                    // Add invoice data if PDF was uploaded (Issue #002)
+                    if (!string.IsNullOrEmpty(InvoicePdfData))
+                    {
+                        try
+                        {
+                            transaction.InvoicePdfData = Convert.FromBase64String(InvoicePdfData);
+                            transaction.InvoiceNumber = InvoiceNumber;
+                            transaction.VendorName = VendorName;
+                            transaction.PdfUploadedAt = DateTime.Now;
+                            
+                            // Parse extracted invoice date if provided
+                            if (!string.IsNullOrEmpty(InvoiceDateExtracted) && 
+                                DateTime.TryParse(InvoiceDateExtracted, out var invoiceDate))
+                            {
+                                transaction.InvoiceDate = invoiceDate;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error processing invoice data during transaction save");
+                            // Continue without invoice data if there's an error
+                        }
+                    }
+
                     _context.SecurityLogs.Add(transaction);
                     await _context.SaveChangesAsync();
 
                     var primaryAccountName = mappingResult.PrimaryAccount?.AccountName ?? "Selected account";
                     var contraAccountName = mappingResult.ContraAccount?.AccountName ?? "Contra account";
                     
-                    TempData["Success"] = $"Transaction created successfully! R{viewModel.Amount:N2} transaction between {primaryAccountName} and {contraAccountName}.";
+                    var successMessage = $"Transaction created successfully! R{viewModel.Amount:N2} transaction between {primaryAccountName} and {contraAccountName}.";
+                    if (!string.IsNullOrEmpty(InvoiceNumber))
+                    {
+                        successMessage += $" Invoice #{InvoiceNumber} linked to transaction.";
+                    }
+                    
+                    TempData["Success"] = successMessage;
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -524,6 +557,55 @@ namespace Cascade.Areas.Accountant.Controllers
             return RedirectToAction(nameof(Create), new { correctingTransactionId = id });
         }
 
+        // API endpoint for processing invoice PDFs (Issue #002)
+        [HttpPost]
+        public async Task<IActionResult> ProcessInvoice(IFormFile invoiceFile)
+        {
+            try
+            {
+                if (invoiceFile == null || invoiceFile.Length == 0)
+                    return Json(new { success = false, error = "No file was uploaded" });
+
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser?.CompanyId == null)
+                    return Json(new { success = false, error = "User company information not found" });
+
+                // Get services from dependency injection
+                var pdfProcessor = HttpContext.RequestServices.GetRequiredService<InvoicePdfProcessor>();
+                
+                // Process the PDF
+                var invoiceData = await pdfProcessor.ProcessInvoiceAsync(invoiceFile);
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        vendorName = invoiceData.VendorName,
+                        amount = invoiceData.Amount,
+                        invoiceDate = invoiceData.InvoiceDate.ToString("yyyy-MM-dd"),
+                        invoiceNumber = invoiceData.InvoiceNumber,
+                        description = invoiceData.Description,
+                        suggestedAccountType = invoiceData.SuggestedAccountType,
+                        pdfData = Convert.ToBase64String(invoiceData.PdfData),
+                        originalFileName = invoiceData.OriginalFileName
+                    }
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = $"An error occurred while processing the invoice: {ex.Message}" });
+            }
+        }
+
         // API endpoint for searching accounts
         [HttpGet]
         public async Task<IActionResult> SearchAccounts(string term = "")
@@ -556,6 +638,22 @@ namespace Cascade.Areas.Accountant.Controllers
         [HttpPost]
         public async Task<IActionResult> GetTransactionMapping([FromBody] TransactionMappingRequest request)
         {
+            // Validate request
+            if (request == null)
+            {
+                return Json(new { success = false, error = "Invalid request. Please select an account and transaction direction." });
+            }
+
+            if (request.SelectedAccountId <= 0)
+            {
+                return Json(new { success = false, error = "Please select a valid account." });
+            }
+
+            if (request.Amount <= 0)
+            {
+                return Json(new { success = false, error = "Amount must be greater than zero." });
+            }
+
             var currentUser = await _userManager.GetUserAsync(User);
 
             if (currentUser?.CompanyId == null)
@@ -573,13 +671,31 @@ namespace Cascade.Areas.Accountant.Controllers
 
                 if (!result.IsSuccess)
                 {
-                    return Json(new { success = false, error = result.ErrorMessage });
+                    return Json(new { success = false, error = result.ErrorMessage ?? "Unable to determine account mapping." });
                 }
 
                 var contraAccounts = await _mappingService.GetAvailableContraAccountsAsync(
                     request.SelectedAccountId,
                     request.Direction,
                     currentUser.CompanyId);
+
+                // Add safety checks for null accounts
+                if (result.PrimaryAccount == null || result.ContraAccount == null)
+                {
+                    return Json(new { success = false, error = "Account information could not be loaded properly. Please ensure the selected account exists and belongs to your company." });
+                }
+
+                var alternativeContraAccounts = (contraAccounts ?? new List<AvailableContraAccount>())
+                    .Where(a => a != null)
+                    .Select(a => new
+                    {
+                        id = a.AccountId,
+                        name = a.AccountName ?? "Unknown Account",
+                        type = a.AccountType.ToString(),
+                        priority = a.Priority,
+                        isRecommended = a.IsRecommended
+                    })
+                    .ToList();
 
                 return Json(new
                 {
@@ -588,30 +704,32 @@ namespace Cascade.Areas.Accountant.Controllers
                     creditAccountId = result.CreditAccountId,
                     primaryAccount = new
                     {
-                        id = result.PrimaryAccount!.AccountId,
-                        name = result.PrimaryAccount.AccountName,
+                        id = result.PrimaryAccount.AccountId,
+                        name = result.PrimaryAccount.AccountName ?? "Unknown Account",
                         type = result.PrimaryAccount.Mx9Qw7Type.ToString()
                     },
                     contraAccount = new
                     {
-                        id = result.ContraAccount!.AccountId,
-                        name = result.ContraAccount.AccountName,
+                        id = result.ContraAccount.AccountId,
+                        name = result.ContraAccount.AccountName ?? "Unknown Account",
                         type = result.ContraAccount.Mx9Qw7Type.ToString()
                     },
-                    explanation = result.Explanation,
-                    alternativeContraAccounts = contraAccounts.Select(a => new
-                    {
-                        id = a.AccountId,
-                        name = a.AccountName,
-                        type = a.AccountType.ToString(),
-                        priority = a.Priority,
-                        isRecommended = a.IsRecommended
-                    }).ToList()
+                    explanation = result.Explanation ?? "Transaction mapping completed",
+                    alternativeContraAccounts
                 });
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Json(new { success = false, error = $"Missing required information: {ex.ParamName}. Please ensure all fields are filled correctly." });
+            }
+            catch (ArgumentException ex)
+            {
+                return Json(new { success = false, error = $"Invalid request: {ex.Message}" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = "An error occurred while determining account mapping: " + ex.Message });
+                // Log the full exception for debugging (in production, use proper logging)
+                return Json(new { success = false, error = $"An error occurred while determining account mapping. Please try again or contact support if the problem persists. Error: {ex.Message}" });
             }
         }
 
@@ -751,7 +869,7 @@ namespace Cascade.Areas.Accountant.Controllers
         {
             if (account == null) return TransactionDirection.MoneyOut;
 
-            var accountName = account.AccountName.ToLower();
+            var accountName = (account.AccountName ?? string.Empty).ToLowerInvariant();
             var accountType = account.Mx9Qw7Type;
 
             // For cash/bank accounts, direction depends on context
@@ -786,6 +904,72 @@ namespace Cascade.Areas.Accountant.Controllers
                     (selectedAccount.AccountId, contraAccount.AccountId),
                 _ => throw new ArgumentException($"Unknown transaction direction: {direction}")
             };
+        }
+
+        // GET: Download Invoice PDF (Issue #002)
+        [HttpGet]
+        public async Task<IActionResult> DownloadInvoicePdf(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            if (currentUser?.CompanyId == null)
+            {
+                return Forbid();
+            }
+
+            var transaction = await _context.SecurityLogs
+                .FirstOrDefaultAsync(t => t.TransactionId == id && t.CompanyId == currentUser.CompanyId);
+
+            if (transaction == null) return NotFound();
+
+            // Check if PDF data exists
+            if (transaction.InvoicePdfData == null || transaction.InvoicePdfData.Length == 0)
+            {
+                return NotFound("No PDF file attached to this transaction.");
+            }
+
+            // Generate filename
+            var invoiceNumber = transaction.InvoiceNumber ?? transaction.TransactionId.ToString();
+            var fileName = transaction.OriginalFileName ?? $"Invoice-{invoiceNumber}-{transaction.TransactionDate:yyyyMMdd}.pdf";
+            if (!fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                fileName += ".pdf";
+            }
+
+            // Return PDF file
+            return File(transaction.InvoicePdfData, "application/pdf", fileName);
+        }
+
+        // GET: View Invoice PDF in modal (Issue #002)
+        [HttpGet]
+        public async Task<IActionResult> ViewInvoicePdf(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            if (currentUser?.CompanyId == null)
+            {
+                return Forbid();
+            }
+
+            var transaction = await _context.SecurityLogs
+                .FirstOrDefaultAsync(t => t.TransactionId == id && t.CompanyId == currentUser.CompanyId);
+
+            if (transaction == null) return NotFound();
+
+            // Check if PDF data exists
+            if (transaction.InvoicePdfData == null || transaction.InvoicePdfData.Length == 0)
+            {
+                return NotFound("No PDF file attached to this transaction.");
+            }
+
+            // Return PDF file for inline viewing (set Content-Disposition to inline)
+            return File(transaction.InvoicePdfData, "application/pdf");
         }
     }
 

@@ -1,6 +1,10 @@
 using Cascade.Fx9Kl2;
+using Cascade.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using System.Threading;
+using System.IO;
 
 namespace Cascade.A1B2C3D4
 {
@@ -15,8 +19,186 @@ namespace Cascade.A1B2C3D4
 
             Console.WriteLine("Starting database seeding...");
 
-            // Ensure database is created
-            await context.Database.EnsureCreatedAsync();
+            // Ensure database exists before applying migrations
+            try
+            {
+                var connectionString = context.Database.GetConnectionString();
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    Console.WriteLine("Warning: Connection string is empty. Cannot initialize database.");
+                    return;
+                }
+
+                // Extract database name from connection string
+                var builder = new SqlConnectionStringBuilder(connectionString);
+                var databaseName = builder.InitialCatalog;
+                builder.InitialCatalog = "master"; // Connect to master database first
+
+                // Try to create database if it doesn't exist
+                using (var masterConnection = new SqlConnection(builder.ConnectionString))
+                {
+                    await masterConnection.OpenAsync();
+                    
+                    // First check if database exists in SQL Server
+                    var checkDbCommand = new SqlCommand(
+                        $@"SELECT name FROM sys.databases WHERE name = '{databaseName}'", masterConnection);
+                    var dbExists = await checkDbCommand.ExecuteScalarAsync();
+                    
+                    if (dbExists == null)
+                    {
+                        // Database doesn't exist in SQL Server - try to create it
+                        // Check if old database files exist and need to be cleaned up
+                        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        var oldMdfPath = Path.Combine(userProfile, $"{databaseName}.mdf");
+                        var oldLdfPath = Path.Combine(userProfile, $"{databaseName}_log.ldf");
+                        
+                        if (File.Exists(oldMdfPath) || File.Exists(oldLdfPath))
+                        {
+                            Console.WriteLine($"Found orphaned database files. Attempting to attach existing database...");
+                            
+                            // Try to attach the existing database files
+                            try
+                            {
+                                var attachCommand = new SqlCommand(
+                                    $@"CREATE DATABASE [{databaseName}]
+                                       ON (FILENAME = '{oldMdfPath}'),
+                                          (FILENAME = '{oldLdfPath}')
+                                       FOR ATTACH", masterConnection);
+                                await attachCommand.ExecuteNonQueryAsync();
+                                Console.WriteLine($"Successfully attached existing database '{databaseName}'");
+                            }
+                            catch (SqlException attachEx)
+                            {
+                                if (attachEx.Number == 5170 || attachEx.Number == 1801) // File exists or database already exists
+                                {
+                                    Console.WriteLine($"Warning: Cannot attach database. Attempting to create new database...");
+                                    // Try to delete old files and create fresh database
+                                    try
+                                    {
+                                        // Delete old files if they exist
+                                        if (File.Exists(oldMdfPath))
+                                        {
+                                            File.Delete(oldMdfPath);
+                                            Console.WriteLine($"Deleted old database file: {oldMdfPath}");
+                                        }
+                                        if (File.Exists(oldLdfPath))
+                                        {
+                                            File.Delete(oldLdfPath);
+                                            Console.WriteLine($"Deleted old log file: {oldLdfPath}");
+                                        }
+                                        
+                                        // Now create new database
+                                        var createCommand = new SqlCommand(
+                                            $@"CREATE DATABASE [{databaseName}]", masterConnection);
+                                        await createCommand.ExecuteNonQueryAsync();
+                                        Console.WriteLine($"Database '{databaseName}' created successfully");
+                                    }
+                                    catch (UnauthorizedAccessException authEx)
+                                    {
+                                        Console.WriteLine($"Permission denied deleting old database files.");
+                                        Console.WriteLine($"Please run the application as Administrator or manually delete:");
+                                        Console.WriteLine($"  - {oldMdfPath}");
+                                        Console.WriteLine($"  - {oldLdfPath}");
+                                        Console.WriteLine($"Or run the fix_database.ps1 script to clean up old files.");
+                                    }
+                                    catch (IOException ioEx)
+                                    {
+                                        Console.WriteLine($"Database files are locked or in use.");
+                                        Console.WriteLine($"Please close SQL Server Management Studio and any applications using the database.");
+                                        Console.WriteLine($"Then delete these files manually:");
+                                        Console.WriteLine($"  - {oldMdfPath}");
+                                        Console.WriteLine($"  - {oldLdfPath}");
+                                        Console.WriteLine($"Or run the fix_database.ps1 script.");
+                                    }
+                                    catch (Exception deleteEx)
+                                    {
+                                        Console.WriteLine($"Warning: Could not clean up old files: {deleteEx.Message}");
+                                        Console.WriteLine($"Please manually delete: {oldMdfPath} and {oldLdfPath}");
+                                        Console.WriteLine($"Or run the fix_database.ps1 script, then restart the application.");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Warning: Cannot attach database. Error: {attachEx.Message} (Error Number: {attachEx.Number})");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // No old files, create new database
+                            try
+                            {
+                                var createCommand = new SqlCommand(
+                                    $@"CREATE DATABASE [{databaseName}]", masterConnection);
+                                await createCommand.ExecuteNonQueryAsync();
+                                Console.WriteLine($"Database '{databaseName}' created successfully");
+                            }
+                            catch (SqlException createEx)
+                            {
+                                Console.WriteLine($"SQL Server error creating database: {createEx.Message} (Error Number: {createEx.Number})");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Database '{databaseName}' already exists in SQL Server");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Could not verify/create database: {ex.Message}");
+                // Continue - database might already exist
+            }
+
+            // Apply pending migrations - this will create tables if database exists
+            try
+            {
+                Console.WriteLine("Applying database migrations...");
+                await context.Database.MigrateAsync();
+                Console.WriteLine("Database migrations applied successfully");
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Number == 4060) // Database doesn't exist
+                {
+                    Console.WriteLine($"Error: Database does not exist and could not be created automatically.");
+                    Console.WriteLine($"Please run the create_database.sql script manually or ensure SQL Server LocalDB is running.");
+                    Console.WriteLine($"Error details: {sqlEx.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"SQL Server error: {sqlEx.Message} (Error Number: {sqlEx.Number})");
+                    Console.WriteLine($"Please check your database connection string and SQL Server permissions.");
+                }
+                // Don't throw - let the app continue
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Could not apply migrations: {ex.Message}");
+                Console.WriteLine($"Migration error details: {ex.GetType().Name}");
+                // Don't fail the app if migrations fail - database might already be up to date
+            }
+
+            // Test database connection after migrations
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                var canConnect = await context.Database.CanConnectAsync(cts.Token);
+                if (!canConnect)
+                {
+                    Console.WriteLine("Warning: Cannot connect to database after migrations. Skipping seeding.");
+                    return;
+                }
+                Console.WriteLine("Database connection verified");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Cannot verify database connection: {ex.Message}");
+                Console.WriteLine($"Connection error type: {ex.GetType().Name}");
+                // Don't throw - just skip seeding if connection fails
+                return;
+            }
 
             // Seed Hx7Tz3Data
             if (!context.SystemEntries.Any())
@@ -334,6 +516,11 @@ namespace Cascade.A1B2C3D4
                 Console.WriteLine("- Mandlakayise Primary School (2021) with budget vs actual comparisons");
                 Console.WriteLine("- Total transactions: Multiple years with realistic budget variance scenarios");
             }
+
+            // Seed sample students with Zulu names and SA ID numbers (Issue #006: Age Analysis for School Fees)
+            Console.WriteLine("\n--- Seeding Sample Students for Age Analysis ---");
+            var studentSeeder = scope.ServiceProvider.GetRequiredService<StudentSeederService>();
+            await studentSeeder.SeedStudentsAsync();
 
             Console.WriteLine("Database seeding completed successfully!");
         }

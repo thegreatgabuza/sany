@@ -1,6 +1,0 @@
-wwwroot\css\Cascade.styles.css
-wwwroot\css\site.css
-wwwroot\favicon.ico
-wwwroot\images\logo.svg
-wwwroot\js\notes-modal.js
-wwwroot\lib\bootstrap\dist\css\bootstrap.min.css

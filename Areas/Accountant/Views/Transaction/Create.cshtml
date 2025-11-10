@@ -226,7 +226,7 @@
                                 </label>
                                 <div class="space-y-3">
                                     <label class="flex items-center p-4 bg-green-50 border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-100 transition-colors">
-                                        <input type="radio" asp-for="Direction" value="@TransactionDirection.MoneyOut" class="sr-only" />
+                                        <input type="radio" asp-for="Direction" value="0" class="sr-only" />
                                         <div class="w-5 h-5 bg-white border-2 border-green-400 rounded-full mr-3 flex items-center justify-center">
                                             <div class="w-2 h-2 bg-green-500 rounded-full hidden radio-dot"></div>
                                         </div>
@@ -237,7 +237,7 @@
                                     </label>
                                     
                                     <label class="flex items-center p-4 bg-blue-50 border-2 border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
-                                        <input type="radio" asp-for="Direction" value="@TransactionDirection.MoneyIn" class="sr-only" />
+                                        <input type="radio" asp-for="Direction" value="1" class="sr-only" />
                                         <div class="w-5 h-5 bg-white border-2 border-blue-400 rounded-full mr-3 flex items-center justify-center">
                                             <div class="w-2 h-2 bg-blue-500 rounded-full hidden radio-dot"></div>
                                         </div>
@@ -248,7 +248,7 @@
                                     </label>
                                     
                                     <label class="flex items-center p-4 bg-purple-50 border-2 border-purple-200 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors">
-                                        <input type="radio" asp-for="Direction" value="@TransactionDirection.Transfer" class="sr-only" />
+                                        <input type="radio" asp-for="Direction" value="2" class="sr-only" />
                                         <div class="w-5 h-5 bg-white border-2 border-purple-400 rounded-full mr-3 flex items-center justify-center">
                                             <div class="w-2 h-2 bg-purple-500 rounded-full hidden radio-dot"></div>
                                         </div>
@@ -322,8 +322,8 @@
                                 <i id="previewArrow" class="fas fa-arrow-down text-slate-400 text-xl"></i>
                             </div>
                             
-                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
-                                <div class="text-sm text-green-600 font-medium mb-2">System Auto-Selects</div>
+                            <div id="previewContraAccountBox" class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
+                                <div id="previewContraAccountLabel" class="text-sm text-green-600 font-medium mb-2">System Auto-Selects</div>
                                 <div id="previewContraAccount" class="font-semibold text-green-900"></div>
                             </div>
                             
@@ -350,6 +350,9 @@
             </a>
             
             <div class="flex space-x-4">
+                <button type="button" class="px-6 py-3 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors" data-bs-toggle="modal" data-bs-target="#invoiceUploadModal">
+                    <i class="fas fa-file-pdf mr-2"></i>Upload Invoice
+                </button>
                 <button type="button" id="previewButton" class="px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors">
                     <i class="fas fa-eye mr-2"></i>Preview Transaction
                 </button>
@@ -362,6 +365,96 @@
 
         <div asp-validation-summary="All" class="text-red-600 mt-6"></div>
     </form>
+
+    <!-- Invoice Upload Modal (Issue #002) -->
+    <div class="modal fade" id="invoiceUploadModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient-to-r from-cascadeBlue to-aquaMist">
+                    <h5 class="modal-title text-white">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>Upload Invoice PDF
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <!-- Drag & Drop Area -->
+                    <div class="upload-area border-3 border-dashed border-cascadeBlue bg-blue-50 p-8 text-center rounded-lg mb-4 cursor-pointer hover:bg-blue-100 transition-colors" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt text-cascadeBlue text-4xl mb-3"></i>
+                        <p class="text-slate-700 font-medium mb-2">Drag and drop your PDF invoice here</p>
+                        <p class="text-slate-500 text-sm mb-4">or</p>
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('invoiceFile').click()">
+                            <i class="fas fa-folder-open mr-2"></i>Browse Files
+                        </button>
+                        <input type="file" id="invoiceFile" accept=".pdf" style="display:none;">
+                        <p class="text-xs text-slate-500 mt-3">PDF only • Max 10MB</p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div id="uploadProgress" style="display:none;" class="mt-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-sm text-slate-600">Uploading and processing invoice...</span>
+                            <span id="uploadPercent" class="ms-auto text-sm font-medium text-cascadeBlue">0%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-cascadeBlue" 
+                                 id="progressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Extracted Data Preview -->
+                    <div id="extractedDataPreview" style="display:none;" class="mt-6">
+                        <div class="alert alert-success mb-4">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <strong>Invoice data extracted successfully!</strong>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-sm text-slate-600">Invoice Number</label>
+                                <input type="text" class="form-control" id="previewInvoiceNo" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-sm text-slate-600">Invoice Date</label>
+                                <input type="date" class="form-control" id="previewInvoiceDate" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-sm text-slate-600">Vendor Name</label>
+                                <input type="text" class="form-control" id="previewVendor">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-sm text-slate-600">Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R</span>
+                                    <input type="number" step="0.01" class="form-control" id="previewAmount">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-sm text-slate-600">Suggested Account Type</label>
+                            <input type="text" class="form-control bg-light" id="previewAccountType" readonly>
+                            <small class="text-slate-600 d-block mt-2">This will help auto-select the correct account</small>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="uploadError" style="display:none;" class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span id="errorMessage"></span>
+                    </div>
+                </div>
+                <div class="modal-footer bg-slate-50 border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmExtractBtn" style="display:none;">
+                        <i class="fas fa-check mr-2"></i>Confirm & Auto-Fill Form
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -535,11 +628,11 @@
                             dot.classList.remove('hidden');
                             
                             // Add type-specific ring color
-                            if (radio.value === '@TransactionDirection.MoneyOut') {
+                            if (radio.value === '0') {
                                 label.classList.add('ring-green-500');
-                            } else if (radio.value === '@TransactionDirection.MoneyIn') {
+                            } else if (radio.value === '1') {
                                 label.classList.add('ring-blue-500');
-                            } else if (radio.value === '@TransactionDirection.Transfer') {
+                            } else if (radio.value === '2') {
                                 label.classList.add('ring-purple-500');
                             }
                         } else {
@@ -565,40 +658,97 @@
 
         // Update the transaction preview
         function updatePreview() {
-            const selectedAccountId = document.getElementById('selectedAccountId').value;
-            const direction = document.querySelector('input[name="Direction"]:checked')?.value;
-            const amount = parseFloat(document.getElementById('Amount').value) || 0;
+            const selectedAccountIdStr = document.getElementById('selectedAccountId').value;
+            const directionChecked = document.querySelector('input[name="Direction"]:checked');
+            const directionValue = directionChecked ? directionChecked.value : null;
+            const amountStr = document.getElementById('Amount').value;
+            
+            console.log('Preview update - Account:', selectedAccountIdStr, 'Direction:', directionValue, 'Amount:', amountStr);
 
-            if (!selectedAccountId || !direction || amount <= 0) {
+            // Show empty state if required fields are empty
+            if (!selectedAccountIdStr || directionValue === null || !amountStr) {
+                console.log('Missing required fields, showing empty preview');
                 showEmptyPreview();
                 return;
             }
 
+            // Parse inputs
+            const accountIdNum = parseInt(selectedAccountIdStr, 10);
+            const directionNum = parseInt(directionValue, 10);
+            const amount = parseFloat(amountStr);
+            
+            // Validate parsed values
+            if (isNaN(accountIdNum) || isNaN(directionNum) || isNaN(amount)) {
+                console.warn('Failed to parse inputs', { accountIdNum, directionNum, amount });
+                showEmptyPreview();
+                return;
+            }
+            
+            // Validate amount is positive
+            if (amount <= 0) {
+                console.log('Amount is not positive, showing empty preview');
+                showEmptyPreview();
+                return;
+            }
+            
+            // Validate account ID is positive
+            if (accountIdNum <= 0) {
+                console.warn('Invalid account ID:', accountIdNum);
+                showErrorPreview('Please select a valid account');
+                return;
+            }
+
             // Call the API to get transaction mapping
-            fetch('@Url.Action("GetTransactionMapping", "Transaction", new { area = "Accountant" })', {
+            const url = '@Url.Action("GetTransactionMapping", "Transaction", new { area = "Accountant" })';
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            
+            if (!token) {
+                console.error('No CSRF token found');
+                showErrorPreview('Security token not found. Please refresh the page.');
+                return;
+            }
+
+            console.log('Sending mapping request:', { accountIdNum, directionNum, amount });
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    'RequestVerificationToken': token
                 },
                 body: JSON.stringify({
-                    selectedAccountId: parseInt(selectedAccountId),
-                    direction: parseInt(direction),
+                    selectedAccountId: accountIdNum,
+                    direction: directionNum,
                     amount: amount
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status, 'OK:', response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.success) {
+                console.log('Mapping response:', data);
+                
+                if (data && data.success === true) {
                     currentMapping = data;
                     showMappingPreview(data);
+                } else if (data && data.success === false) {
+                    const errorMessage = data.error || 'An error occurred while determining account mapping';
+                    console.warn('API returned error:', errorMessage);
+                    showErrorPreview(errorMessage);
                 } else {
-                    showErrorPreview(data.error);
+                    console.error('Unexpected response format:', data);
+                    showErrorPreview('Unexpected response format from server');
                 }
             })
             .catch(error => {
                 console.error('Error getting transaction mapping:', error);
-                showErrorPreview('Failed to get transaction mapping');
+                const errorMessage = error.message || 'Failed to get transaction mapping. Please try again.';
+                showErrorPreview(errorMessage);
             });
         }
 
@@ -614,19 +764,43 @@
             document.getElementById('previewContent').classList.remove('hidden');
             
             // Update preview content
-            document.getElementById('previewSelectedAccount').textContent = mapping.primaryAccount.name;
-            document.getElementById('previewContraAccount').textContent = mapping.contraAccount.name;
-            document.getElementById('previewExplanation').textContent = mapping.explanation;
+            if (mapping.primaryAccount && mapping.primaryAccount.name) {
+                document.getElementById('previewSelectedAccount').textContent = mapping.primaryAccount.name;
+            } else if (selectedAccount) {
+                document.getElementById('previewSelectedAccount').textContent = selectedAccount.displayText || selectedAccount.name || 'Selected Account';
+            } else {
+                document.getElementById('previewSelectedAccount').textContent = 'Selected Account';
+            }
+            
+            if (mapping.contraAccount && mapping.contraAccount.name) {
+                const contraAccountDiv = document.getElementById('previewContraAccount');
+                contraAccountDiv.textContent = mapping.contraAccount.name;
+            } else {
+                document.getElementById('previewContraAccount').textContent = 'No contra account found';
+            }
+            
+            document.getElementById('previewExplanation').textContent = mapping.explanation || 'Transaction mapping completed';
+            
+            // Reset contra account box styling to success state
+            const contraBox = document.getElementById('previewContraAccountBox');
+            const contraLabel = document.getElementById('previewContraAccountLabel');
+            if (contraBox) {
+                contraBox.className = 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4';
+            }
+            if (contraLabel) {
+                contraLabel.className = 'text-sm text-green-600 font-medium mb-2';
+                contraLabel.textContent = 'System Auto-Selects';
+            }
             
             // Update arrow direction
             const arrow = document.getElementById('previewArrow');
             const direction = document.querySelector('input[name="Direction"]:checked')?.value;
             
-            if (direction === '@TransactionDirection.MoneyOut') {
+            if (direction === '0') {
                 arrow.className = 'fas fa-arrow-down text-red-500 text-xl';
-            } else if (direction === '@TransactionDirection.MoneyIn') {
+            } else if (direction === '1') {
                 arrow.className = 'fas fa-arrow-up text-green-500 text-xl';
-            } else if (direction === '@TransactionDirection.Transfer') {
+            } else if (direction === '2') {
                 arrow.className = 'fas fa-exchange-alt text-purple-500 text-xl';
             }
             
@@ -636,9 +810,9 @@
                 const listDiv = document.getElementById('contraAccountList');
                 
                 const alternativeHtml = mapping.alternativeContraAccounts
-                    .filter(acc => acc.id !== mapping.contraAccount.id)
+                    .filter(acc => acc && acc.id !== mapping.contraAccount.id)
                     .slice(0, 3)
-                    .map(acc => `<div class="text-xs text-slate-600">${acc.name} (${acc.type})</div>`)
+                    .map(acc => `<div class="text-xs text-slate-600">${acc.name || 'Unknown'} (${acc.type || 'N/A'})</div>`)
                     .join('');
                 
                 if (alternativeHtml) {
@@ -647,6 +821,8 @@
                 } else {
                     optionsDiv.classList.add('hidden');
                 }
+            } else {
+                document.getElementById('contraAccountOptions').classList.add('hidden');
             }
         }
 
@@ -655,10 +831,31 @@
             document.getElementById('previewEmpty').classList.add('hidden');
             document.getElementById('previewContent').classList.remove('hidden');
             
-            document.getElementById('previewSelectedAccount').textContent = 'Error';
-            document.getElementById('previewContraAccount').textContent = error;
+            // Show selected account if available
+            const selectedAccountId = document.getElementById('selectedAccountId').value;
+            if (selectedAccountId && selectedAccount) {
+                document.getElementById('previewSelectedAccount').textContent = selectedAccount.displayText || selectedAccount.name || 'Selected Account';
+            } else {
+                document.getElementById('previewSelectedAccount').textContent = 'No account selected';
+            }
+            
+            // Show error in contra account area with proper styling
+            const contraAccountDiv = document.getElementById('previewContraAccount');
+            contraAccountDiv.innerHTML = `<span class="text-red-600 font-medium">${error || 'An error occurred'}</span>`;
+            
             document.getElementById('previewExplanation').textContent = 'Please check your selection and try again.';
             document.getElementById('contraAccountOptions').classList.add('hidden');
+            
+            // Change the contra account box to show error state
+            const contraBox = document.getElementById('previewContraAccountBox');
+            const contraLabel = document.getElementById('previewContraAccountLabel');
+            if (contraBox) {
+                contraBox.className = 'bg-red-50 border border-red-200 rounded-lg p-4';
+            }
+            if (contraLabel) {
+                contraLabel.className = 'text-sm text-red-600 font-medium mb-2';
+                contraLabel.textContent = 'Error';
+            }
         }
 
         // Clear preview
@@ -713,21 +910,48 @@
 
         // Generate description (placeholder - implement based on mapping)
         function generateDescription() {
-            if (!currentMapping) {
+            // Get current values
+            const direction = document.querySelector('input[name="Direction"]:checked')?.value;
+            const selectedAccountId = document.getElementById('selectedAccountId').value;
+            const amount = document.getElementById('Amount').value;
+            
+            if (!selectedAccountId || !direction) {
                 alert('Please select an account and transaction type first.');
                 return;
             }
             
-            // Simple description generation
-            const direction = document.querySelector('input[name="Direction"]:checked')?.value;
-            let description = '';
+            // Get the selected account name
+            let accountName = 'Transaction';
+            if (selectedAccount && selectedAccount.name) {
+                accountName = selectedAccount.name;
+            }
             
-            if (direction === '@TransactionDirection.MoneyOut') {
-                description = `Payment to ${currentMapping.primaryAccount.name}`;
-            } else if (direction === '@TransactionDirection.MoneyIn') {
-                description = `Receipt from ${currentMapping.primaryAccount.name}`;
-            } else if (direction === '@TransactionDirection.Transfer') {
-                description = `Transfer from ${currentMapping.contraAccount.name} to ${currentMapping.primaryAccount.name}`;
+            let description = '';
+            const directionNum = parseInt(direction);
+            
+            // Generate based on direction
+            if (directionNum === 0) { // MoneyOut
+                description = `Payment for ${accountName}`;
+                if (amount) {
+                    description += ` - R${parseFloat(amount).toFixed(2)}`;
+                }
+            } else if (directionNum === 1) { // MoneyIn
+                description = `Receipt from ${accountName}`;
+                if (amount) {
+                    description += ` - R${parseFloat(amount).toFixed(2)}`;
+                }
+            } else if (directionNum === 2) { // Transfer
+                description = `Transfer to ${accountName}`;
+                if (amount) {
+                    description += ` - R${parseFloat(amount).toFixed(2)}`;
+                }
+            } else {
+                description = `Transaction for ${accountName}`;
+            }
+            
+            // If we have mapping data, use the explanation
+            if (currentMapping && currentMapping.explanation) {
+                description = currentMapping.explanation;
             }
             
             document.getElementById('descriptionInput').value = description;
@@ -736,11 +960,289 @@
         // Generate reference (placeholder)
         function generateReference() {
             const today = new Date();
-            const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-            const randomNum = Math.floor(Math.random() * 999) + 1;
-            const reference = `TXN-${dateStr}-${String(randomNum).padStart(3, '0')}`;
+            
+            // Format: TXN-YYYYMMDD-HHMM-XXXX (transaction timestamp + 4 random digits)
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const hours = String(today.getHours()).padStart(2, '0');
+            const minutes = String(today.getMinutes()).padStart(2, '0');
+            const randomNum = Math.floor(Math.random() * 9999);
+            
+            const reference = `TXN-${year}${month}${day}-${hours}${minutes}-${String(randomNum).padStart(4, '0')}`;
             
             document.getElementById('referenceInput').value = reference;
+        }
+
+        // ==================== INVOICE UPLOAD FUNCTIONALITY (Issue #002) ====================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            setupInvoiceUpload();
+        });
+
+        function setupInvoiceUpload() {
+            const dropZone = document.getElementById('dropZone');
+            const invoiceFile = document.getElementById('invoiceFile');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('progressBar');
+            const extractedDataPreview = document.getElementById('extractedDataPreview');
+            const uploadError = document.getElementById('uploadError');
+            const confirmBtn = document.getElementById('confirmExtractBtn');
+            
+            let currentInvoiceData = null;
+            
+            // Drag & Drop Handlers
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.add('border-cascadeBlue', 'bg-blue-100');
+                });
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.remove('border-cascadeBlue', 'bg-blue-100');
+                });
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            });
+
+            dropZone.addEventListener('click', () => {
+                invoiceFile.click();
+            });
+            
+            invoiceFile.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+            
+            function handleFiles(files) {
+                if (files.length === 0) return;
+                
+                const file = files[0];
+                
+                if (file.type !== 'application/pdf') {
+                    showError('Please upload a PDF file only');
+                    return;
+                }
+                
+                if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                    showError('File size must be less than 10MB');
+                    return;
+                }
+                
+                uploadAndProcess(file);
+            }
+            
+            function uploadAndProcess(file) {
+                const formData = new FormData();
+                formData.append('invoiceFile', file);
+                
+                uploadProgress.style.display = 'block';
+                extractedDataPreview.style.display = 'none';
+                uploadError.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                progressBar.style.width = '0%';
+                document.getElementById('uploadPercent').textContent = '0%';
+                
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBar.style.width = percentComplete + '%';
+                        document.getElementById('uploadPercent').textContent = Math.round(percentComplete) + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            
+                            if (response.success && response.data) {
+                                currentInvoiceData = response.data;
+                                
+                                progressBar.style.width = '100%';
+                                document.getElementById('uploadPercent').textContent = '100%';
+                                
+                                // Populate preview
+                                document.getElementById('previewInvoiceNo').value = currentInvoiceData.invoiceNumber || '';
+                                document.getElementById('previewInvoiceDate').value = currentInvoiceData.invoiceDate;
+                                document.getElementById('previewVendor').value = currentInvoiceData.vendorName || '';
+                                document.getElementById('previewAmount').value = currentInvoiceData.amount;
+                                document.getElementById('previewAccountType').value = response.suggestedAccountType || 'General Expense';
+                                
+                                extractedDataPreview.style.display = 'block';
+                                confirmBtn.style.display = 'block';
+                                
+                                setTimeout(() => {
+                                    uploadProgress.style.display = 'none';
+                                }, 1000);
+                            } else {
+                                showError(response.error || 'Error processing invoice');
+                                uploadProgress.style.display = 'none';
+                            }
+                        } catch (e) {
+                            showError('Error parsing server response: ' + e.message);
+                            uploadProgress.style.display = 'none';
+                        }
+                    } else {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            showError(response.error || 'Error uploading file: ' + xhr.statusText);
+                        } catch (e) {
+                            showError('Error uploading file: ' + xhr.statusText);
+                        }
+                        uploadProgress.style.display = 'none';
+                    }
+                });
+                
+                xhr.addEventListener('error', () => {
+                    showError('Error uploading file');
+                    uploadProgress.style.display = 'none';
+                });
+                
+                xhr.open('POST', '@Url.Action("ProcessInvoice", "Transaction", new { area = "Accountant" })');
+                xhr.send(formData);
+            }
+            
+            confirmBtn.addEventListener('click', () => {
+                if (!currentInvoiceData) return;
+                
+                // Fill the main transaction form
+                document.getElementById('descriptionInput').value = currentInvoiceData.description || '';
+                document.getElementById('Amount').value = currentInvoiceData.amount;
+                document.getElementById('referenceInput').value = currentInvoiceData.invoiceNumber || '';
+                document.getElementById('TransactionDate').value = currentInvoiceData.invoiceDate;
+                
+                // Store invoice data in hidden fields for form submission
+                // Create hidden fields if they don't exist
+                let invoicePdfDataField = document.getElementById('InvoicePdfData');
+                if (!invoicePdfDataField) {
+                    invoicePdfDataField = document.createElement('input');
+                    invoicePdfDataField.type = 'hidden';
+                    invoicePdfDataField.id = 'InvoicePdfData';
+                    invoicePdfDataField.name = 'InvoicePdfData';
+                    document.getElementById('transactionForm').appendChild(invoicePdfDataField);
+                }
+                invoicePdfDataField.value = currentInvoiceData.pdfData || '';
+                
+                let invoiceNumberField = document.getElementById('InvoiceNumber');
+                if (!invoiceNumberField) {
+                    invoiceNumberField = document.createElement('input');
+                    invoiceNumberField.type = 'hidden';
+                    invoiceNumberField.id = 'InvoiceNumber';
+                    invoiceNumberField.name = 'InvoiceNumber';
+                    document.getElementById('transactionForm').appendChild(invoiceNumberField);
+                }
+                invoiceNumberField.value = currentInvoiceData.invoiceNumber || '';
+                
+                let vendorNameField = document.getElementById('VendorName');
+                if (!vendorNameField) {
+                    vendorNameField = document.createElement('input');
+                    vendorNameField.type = 'hidden';
+                    vendorNameField.id = 'VendorName';
+                    vendorNameField.name = 'VendorName';
+                    document.getElementById('transactionForm').appendChild(vendorNameField);
+                }
+                vendorNameField.value = currentInvoiceData.vendorName || '';
+                
+                let invoiceDateField = document.getElementById('InvoiceDateField');
+                if (!invoiceDateField) {
+                    invoiceDateField = document.createElement('input');
+                    invoiceDateField.type = 'hidden';
+                    invoiceDateField.id = 'InvoiceDateField';
+                    invoiceDateField.name = 'InvoiceDateExtracted';
+                    document.getElementById('transactionForm').appendChild(invoiceDateField);
+                }
+                invoiceDateField.value = currentInvoiceData.invoiceDate || '';
+                
+                // Auto-select account based on suggested account type
+                const suggestedType = currentInvoiceData.suggestedAccountType || 'General Expense';
+                selectAccountByType(suggestedType);
+                
+                // Update preview to show the selected account
+                updatePreview();
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('invoiceUploadModal'));
+                if (modal) modal.hide();
+                
+                // Show success message
+                showSuccessAlert('Invoice data loaded successfully! Account auto-selected based on invoice type. Review and save the transaction.');
+            });
+            
+            function selectAccountByType(accountType) {
+                // Map suggested account type to database account name
+                const accountMapping = {
+                    'Utilities': 'Utilities Expense',
+                    'Consumables': 'Consumables Expense',
+                    'Supplies': 'Supplies Expense',
+                    'Maintenance': 'Maintenance Expense',
+                    'Communications': 'Communications Expense',
+                    'Transport': 'Transport Expense',
+                    'Training': 'Training Expense',
+                    'Professional Services': 'Professional Services',
+                    'Software Subscriptions': 'Software & Subscriptions',
+                    'Catering': 'Catering Expense',
+                    'Advertising': 'Advertising & Marketing',
+                    'Travel': 'Travel Expense',
+                    'Insurance': 'Insurance',
+                    'Donations': 'Donations & Contributions',
+                    'General Expense': 'General Expense',
+                    'Office Equipment': 'Office Equipment'
+                };
+                
+                const accountName = accountMapping[accountType] || accountType;
+                
+                // Find matching account in allAccounts
+                const matchingAccount = allAccounts.find(a => 
+                    a.name.toLowerCase().includes(accountName.toLowerCase()) ||
+                    a.displayText.toLowerCase().includes(accountName.toLowerCase())
+                );
+                
+                if (matchingAccount) {
+                    selectAccount(matchingAccount);
+                    console.log('Auto-selected account: ' + matchingAccount.name);
+                } else {
+                    console.log('No matching account found for: ' + accountName);
+                    console.log('Available accounts:', allAccounts.map(a => a.name));
+                }
+            }
+            
+            function showError(message) {
+                document.getElementById('errorMessage').textContent = message;
+                uploadError.style.display = 'block';
+                extractedDataPreview.style.display = 'none';
+                confirmBtn.style.display = 'none';
+            }
+            
+            function showSuccessAlert(message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-check-circle mr-2"></i>${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.insertBefore(alertDiv, document.body.firstChild);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+            }
         }
     </script>
 }

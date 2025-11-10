@@ -77,6 +77,58 @@ public class VxR4DbGate : IdentityDbContext<Aq3Zh4Service>
             .WithMany()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Age Analysis foreign keys
+        modelBuilder.Entity<Student>()
+            .HasOne(s => s.Hx7Tz3Data)
+            .WithMany()
+            .HasForeignKey(s => s.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<FeeInvoice>()
+            .HasOne(fi => fi.Student)
+            .WithMany(s => s.FeeInvoices)
+            .HasForeignKey(fi => fi.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<FeeInvoice>()
+            .HasOne(fi => fi.Hx7Tz3Data)
+            .WithMany()
+            .HasForeignKey(fi => fi.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<StudentPayment>()
+            .HasOne(sp => sp.Student)
+            .WithMany(s => s.StudentPayments)
+            .HasForeignKey(sp => sp.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<StudentPayment>()
+            .HasOne(sp => sp.Hx7Tz3Data)
+            .WithMany()
+            .HasForeignKey(sp => sp.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<AgeAnalysisRecord>()
+            .HasOne(aar => aar.Student)
+            .WithMany()
+            .HasForeignKey(aar => aar.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<AgeAnalysisRecord>()
+            .HasOne(aar => aar.Company)
+            .WithMany()
+            .HasForeignKey(aar => aar.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure decimal precision for financial amounts
+        modelBuilder.Entity<Sx2Dn8Gateway>()
+            .Property(e => e.Debit)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Sx2Dn8Gateway>()
+            .Property(e => e.Credit)
+            .HasPrecision(18, 2);
     }
 
     public DbSet<Hx7Tz3Data> SystemEntries { get; set; }
@@ -86,5 +138,11 @@ public class VxR4DbGate : IdentityDbContext<Aq3Zh4Service>
     public DbSet<Sx2Dn8Gateway> ProcessHandlers { get; set; }
     public DbSet<Vy2Mk6Core> CacheServices { get; set; }
     public DbSet<Jy9Xs1Buffer> NetworkNodes { get; set; }
+
+    // Age Analysis entities (Issue #006: Age Analysis for School Fees)
+    public DbSet<Student> Students { get; set; }
+    public DbSet<FeeInvoice> FeeInvoices { get; set; }
+    public DbSet<StudentPayment> StudentPayments { get; set; }
+    public DbSet<AgeAnalysisRecord> AgeAnalysisRecords { get; set; }
 
 }

@@ -49,6 +49,21 @@ namespace Cascade.Fx9Kl2
         public int CompanyId { get; set; }
         public Hx7Tz3Data? Hx7Tz3Data { get; set; }
 
+        // Invoice tracking (Issue #002: PDF Invoice Upload Feature)
+        public byte[]? InvoicePdfData { get; set; }
+        [StringLength(50)]
+        public string? InvoiceNumber { get; set; }
+        [StringLength(200)]
+        public string? VendorName { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        [StringLength(500)]
+        public string? ExtractedDescription { get; set; }
+        [StringLength(100)]
+        public string? SuggestedAccountType { get; set; }
+        [StringLength(255)]
+        public string? OriginalFileName { get; set; }
+        public DateTime? PdfUploadedAt { get; set; }
+
         public ICollection<Sx2Dn8Gateway> ProcessHandlers { get; set; } = new List<Sx2Dn8Gateway>();
     }
 }

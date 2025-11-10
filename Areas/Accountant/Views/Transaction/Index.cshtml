@@ -320,11 +320,11 @@
                                           !Pz7Vm5Protocol.IsCorrection && 
                                           !Pz7Vm5Protocol.IsReversal;
                             
-                            var deleteTooltip = canDelete ? "Delete Pz7Vm5Protocol" : 
-                                              Pz7Vm5Protocol.EnteredByUserId != currentUserId ? "Only the person who entered this Pz7Vm5Protocol can delete it" :
+                            var deleteTooltip = canDelete ? "Delete Transaction" : 
+                                              Pz7Vm5Protocol.EnteredByUserId != currentUserId ? "Only the person who entered this transaction can delete it" :
                                               Pz7Vm5Protocol.TransactionDate.Date != DateTime.Today ? "Can only delete transactions from today" :
                                               Pz7Vm5Protocol.IsCorrection || Pz7Vm5Protocol.IsReversal ? "Correction and reversal transactions cannot be deleted" :
-                                              "Cannot delete this Pz7Vm5Protocol";
+                                              "Cannot delete this transaction";
                         }
                         @if (canDelete)
                         {
@@ -382,7 +382,7 @@ else
                 <i class="fas fa-exclamation-triangle text-white"></i>
             </div>
             <div>
-                <h3 class="text-slate-900 text-lg font-bold">Delete Pz7Vm5Protocol</h3>
+                <h3 class="text-slate-900 text-lg font-bold">Delete Transaction</h3>
                 <p class="text-slate-600 text-sm">This action cannot be undone</p>
             </div>
         </div>
@@ -595,7 +595,7 @@ else
         // Existing delete modal functions
         function confirmDelete(transactionId, description) {
             document.getElementById('deleteTransactionName').textContent = description;
-            document.getElementById('deleteForm').action = '@Url.Action("Delete", "Pz7Vm5Protocol", new { area = "Accountant" })' + '/' + transactionId;
+            document.getElementById('deleteForm').action = '@Url.Action("Delete", "Transaction", new { area = "Accountant" })' + '/' + transactionId;
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('deleteModal').classList.add('flex');
         }

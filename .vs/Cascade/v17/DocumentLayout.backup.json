@@ -1,7 +1,24 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\ACE\\Pictures\\Source Code\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|c:\\users\\ace\\pictures\\source code\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|c:\\users\\ace\\pictures\\source code\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|solutionrelative:appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|c:\\users\\ace\\pictures\\source code\\a1b2c3d4\\sxvb2dbinjector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|solutionrelative:a1b2c3d4\\sxvb2dbinjector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|c:\\users\\ace\\pictures\\source code\\areas\\accountant\\controllers\\transactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2DF59A5C-BB2D-4F2F-ADB2-E7F8D162BE40}|Cascade.csproj|solutionrelative:areas\\accountant\\controllers\\transactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,6 +43,56 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SxVb2DbInjector.cs",
+              "DocumentMoniker": "C:\\Users\\ACE\\Pictures\\Source Code\\A1B2C3D4\\SxVb2DbInjector.cs",
+              "RelativeDocumentMoniker": "A1B2C3D4\\SxVb2DbInjector.cs",
+              "ToolTip": "C:\\Users\\ACE\\Pictures\\Source Code\\A1B2C3D4\\SxVb2DbInjector.cs",
+              "RelativeToolTip": "A1B2C3D4\\SxVb2DbInjector.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAAAJcAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T23:51:28.007Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TransactionController.cs",
+              "DocumentMoniker": "C:\\Users\\ACE\\Pictures\\Source Code\\Areas\\Accountant\\Controllers\\TransactionController.cs",
+              "RelativeDocumentMoniker": "Areas\\Accountant\\Controllers\\TransactionController.cs",
+              "ToolTip": "C:\\Users\\ACE\\Pictures\\Source Code\\Areas\\Accountant\\Controllers\\TransactionController.cs",
+              "RelativeToolTip": "Areas\\Accountant\\Controllers\\TransactionController.cs",
+              "ViewState": "AgIAAA4BAAAAAAAAAAAAAEgBAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T14:12:38.299Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\ACE\\Pictures\\Source Code\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "appsettings.Development.json",
+              "ToolTip": "C:\\Users\\ACE\\Pictures\\Source Code\\appsettings.Development.json",
+              "RelativeToolTip": "appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-09T14:11:29.065Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\ACE\\Pictures\\Source Code\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\ACE\\Pictures\\Source Code\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-09T12:03:37.718Z",
+              "EditorCaption": ""
             }
           ]
         }

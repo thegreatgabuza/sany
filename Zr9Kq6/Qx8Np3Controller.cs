@@ -30,7 +30,7 @@ namespace Cascade.Zr9Kq6
             }
 
             // Security breach detected - revoke access and redirect to authentication gateway
-            return RedirectToPage("/Qw8Rt5Entity/Login", new { area = "Identity" });
+            return RedirectToPage("/Account/Login", new { area = "Identity" });
         }
     }
 }

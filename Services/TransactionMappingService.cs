@@ -43,45 +43,82 @@ namespace Cascade.Services
             decimal amount,
             int companyId)
         {
-            var selectedAccount = await _context.DataStreams
-                .FirstOrDefaultAsync(a => a.AccountId == selectedAccountId && a.CompanyId == companyId);
+            try
+            {
+                if (selectedAccountId <= 0)
+                {
+                    return new TransactionMappingResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Invalid account ID provided."
+                    };
+                }
 
-            if (selectedAccount == null)
+                if (companyId <= 0)
+                {
+                    return new TransactionMappingResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Invalid company ID provided."
+                    };
+                }
+
+                var selectedAccount = await _context.DataStreams
+                    .FirstOrDefaultAsync(a => a.AccountId == selectedAccountId && a.CompanyId == companyId);
+
+                if (selectedAccount == null)
+                {
+                    return new TransactionMappingResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Selected account not found or does not belong to your company."
+                    };
+                }
+
+                // Get the best contra account based on the transaction direction and account type
+                var contraAccount = await GetBestContraAccountAsync(selectedAccount, direction, companyId);
+
+                if (contraAccount == null)
+                {
+                    return new TransactionMappingResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "No suitable contra account found. Please ensure you have Cash or Bank accounts set up."
+                    };
+                }
+
+                // Determine which account should be debited and which should be credited
+                var (debitAccountId, creditAccountId) = DetermineDebitCreditAccounts(
+                    selectedAccount, contraAccount, direction);
+
+                return new TransactionMappingResult
+                {
+                    IsSuccess = true,
+                    DebitAccountId = debitAccountId,
+                    CreditAccountId = creditAccountId,
+                    PrimaryAccount = selectedAccount,
+                    ContraAccount = contraAccount,
+                    Direction = direction,
+                    Amount = amount,
+                    Explanation = GetTransactionExplanation(selectedAccount, contraAccount, direction, amount)
+                };
+            }
+            catch (NullReferenceException ex)
             {
                 return new TransactionMappingResult
                 {
                     IsSuccess = false,
-                    ErrorMessage = "Selected account not found or does not belong to your company."
+                    ErrorMessage = $"A null reference error occurred. Please ensure all accounts are properly configured. Details: {ex.Message}"
                 };
             }
-
-            // Get the best contra account based on the transaction direction and account type
-            var contraAccount = await GetBestContraAccountAsync(selectedAccount, direction, companyId);
-
-            if (contraAccount == null)
+            catch (Exception ex)
             {
                 return new TransactionMappingResult
                 {
                     IsSuccess = false,
-                    ErrorMessage = "No suitable contra account found. Please ensure you have Cash or Bank accounts set up."
+                    ErrorMessage = $"Error creating transaction mapping: {ex.Message}"
                 };
             }
-
-            // Determine which account should be debited and which should be credited
-            var (debitAccountId, creditAccountId) = DetermineDebitCreditAccounts(
-                selectedAccount, contraAccount, direction);
-
-            return new TransactionMappingResult
-            {
-                IsSuccess = true,
-                DebitAccountId = debitAccountId,
-                CreditAccountId = creditAccountId,
-                PrimaryAccount = selectedAccount,
-                ContraAccount = contraAccount,
-                Direction = direction,
-                Amount = amount,
-                Explanation = GetTransactionExplanation(selectedAccount, contraAccount, direction, amount)
-            };
         }
 
         public async Task<List<AvailableContraAccount>> GetAvailableContraAccountsAsync(
@@ -97,10 +134,15 @@ namespace Cascade.Services
 
             var contraAccounts = await GetPossibleContraAccountsAsync(primaryAccount, direction, companyId);
 
-            return contraAccounts.Select(account => new AvailableContraAccount
+            if (contraAccounts == null || !contraAccounts.Any())
+            {
+                return new List<AvailableContraAccount>();
+            }
+
+            return contraAccounts.Where(account => account != null).Select(account => new AvailableContraAccount
             {
                 AccountId = account.AccountId,
-                AccountName = account.AccountName,
+                AccountName = account.AccountName ?? "Unknown Account",
                 AccountType = account.Mx9Qw7Type,
                 Priority = GetContraAccountPriority(account, direction),
                 IsRecommended = IsRecommendedContraAccount(account, direction)
@@ -113,15 +155,23 @@ namespace Cascade.Services
             TransactionDirection direction,
             decimal amount)
         {
+            if (primaryAccount == null || contraAccount == null)
+            {
+                return $"R{amount:N2} transaction - account information not available";
+            }
+
+            var primaryName = primaryAccount.AccountName ?? "Unknown Account";
+            var contraName = contraAccount.AccountName ?? "Unknown Account";
+
             return direction switch
             {
                 TransactionDirection.MoneyOut => 
-                    $"R{amount:N2} flows FROM {contraAccount.AccountName} TO {primaryAccount.AccountName}",
+                    $"R{amount:N2} flows FROM {contraName} TO {primaryName}",
                 TransactionDirection.MoneyIn => 
-                    $"R{amount:N2} flows FROM {primaryAccount.AccountName} TO {contraAccount.AccountName}",
+                    $"R{amount:N2} flows FROM {primaryName} TO {contraName}",
                 TransactionDirection.Transfer => 
-                    $"R{amount:N2} transfers FROM {contraAccount.AccountName} TO {primaryAccount.AccountName}",
-                _ => $"R{amount:N2} transaction between {primaryAccount.AccountName} and {contraAccount.AccountName}"
+                    $"R{amount:N2} transfers FROM {contraName} TO {primaryName}",
+                _ => $"R{amount:N2} transaction between {primaryName} and {contraName}"
             };
         }
 
@@ -130,15 +180,24 @@ namespace Cascade.Services
             TransactionDirection direction,
             int companyId)
         {
-            var possibleAccounts = await GetPossibleContraAccountsAsync(selectedAccount, direction, companyId);
-            
-            if (!possibleAccounts.Any())
+            if (selectedAccount == null)
                 return null;
 
-            // Return the highest priority contra account
-            return possibleAccounts
-                .OrderByDescending(a => GetContraAccountPriority(a, direction))
-                .First();
+            var possibleAccounts = await GetPossibleContraAccountsAsync(selectedAccount, direction, companyId);
+            
+            if (possibleAccounts == null || !possibleAccounts.Any())
+                return null;
+
+            // Filter out any null accounts and return the highest priority contra account
+            var validAccounts = possibleAccounts.Where(a => a != null).ToList();
+            if (!validAccounts.Any())
+                return null;
+
+            var bestAccount = validAccounts
+                .OrderByDescending(a => GetContraAccountPriority(a!, direction))
+                .FirstOrDefault();
+            
+            return bestAccount;
         }
 
         private async Task<List<Qw8Rt5Entity>> GetPossibleContraAccountsAsync(
@@ -146,36 +205,92 @@ namespace Cascade.Services
             TransactionDirection direction,
             int companyId)
         {
-            var allAccounts = await _context.DataStreams
-                .Where(a => a.CompanyId == companyId && a.AccountId != selectedAccount.AccountId)
-                .ToListAsync();
+            if (selectedAccount == null)
+                return new List<Qw8Rt5Entity>();
 
-            var possibleAccounts = direction switch
+            try
             {
-                TransactionDirection.MoneyOut or TransactionDirection.MoneyIn =>
-                    // For money transactions, prefer cash/bank accounts
-                    allAccounts.Where(a => 
-                        a.Mx9Qw7Type == Mx9Qw7Type.Asset && 
-                        (a.AccountName.ToLower().Contains("cash") || 
-                         a.AccountName.ToLower().Contains("bank") ||
-                         a.AccountName.ToLower().Contains("petty cash"))
-                    ).ToList(),
-                
-                TransactionDirection.Transfer =>
-                    // For transfers, allow any account except the selected one
-                    allAccounts.Where(a => IsValidTransferAccount(a, selectedAccount)).ToList(),
-                
-                _ => new List<Qw8Rt5Entity>()
-            };
+                var selectedAccountId = selectedAccount.AccountId;
+                if (selectedAccountId <= 0)
+                    return new List<Qw8Rt5Entity>();
 
-            // If no specific accounts found for money transactions, fall back to all asset accounts
-            if ((direction == TransactionDirection.MoneyOut || direction == TransactionDirection.MoneyIn) && 
-                !possibleAccounts.Any())
-            {
-                possibleAccounts = allAccounts.Where(a => a.Mx9Qw7Type == Mx9Qw7Type.Asset).ToList();
+                var allAccounts = await _context.DataStreams
+                    .Where(a => a.CompanyId == companyId && a.AccountId != selectedAccountId)
+                    .ToListAsync();
+
+                if (allAccounts == null || !allAccounts.Any())
+                    return new List<Qw8Rt5Entity>();
+
+                // Filter out any null accounts that might have been returned
+                var validAccounts = allAccounts.Where(a => a != null).ToList();
+                if (!validAccounts.Any())
+                    return new List<Qw8Rt5Entity>();
+
+                var possibleAccounts = direction switch
+                {
+                    TransactionDirection.MoneyOut or TransactionDirection.MoneyIn =>
+                        // For money transactions, prefer cash/bank accounts
+                        validAccounts.Where(a => 
+                        {
+                            try
+                            {
+                                if (a.Mx9Qw7Type != Mx9Qw7Type.Asset)
+                                {
+                                    return false;
+                                }
+
+                                var accountName = a.AccountName ?? string.Empty;
+                                var accountNameLower = accountName.ToLowerInvariant();
+                                return accountNameLower.Contains("cash") ||
+                                       accountNameLower.Contains("bank") ||
+                                       accountNameLower.Contains("petty cash");
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        }).ToList(),
+
+                    TransactionDirection.Transfer =>
+                        // For transfers, allow any account except the selected one
+                        validAccounts.Where(a => 
+                        {
+                            try
+                            {
+                                return IsValidTransferAccount(a, selectedAccount);
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        }).ToList(),
+
+                    _ => new List<Qw8Rt5Entity>()
+                };
+
+                // If no specific accounts found for money transactions, fall back to all asset accounts
+                if ((direction == TransactionDirection.MoneyOut || direction == TransactionDirection.MoneyIn) && 
+                    (possibleAccounts == null || !possibleAccounts.Any()))
+                {
+                    possibleAccounts = validAccounts.Where(a => 
+                    {
+                        try
+                        {
+                            return a.Mx9Qw7Type == Mx9Qw7Type.Asset;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }).ToList();
+                }
+
+                return possibleAccounts ?? new List<Qw8Rt5Entity>();
             }
-
-            return possibleAccounts;
+            catch (Exception)
+            {
+                return new List<Qw8Rt5Entity>();
+            }
         }
 
         private bool IsValidTransferAccount(Qw8Rt5Entity candidateAccount, Qw8Rt5Entity selectedAccount)
@@ -184,6 +299,9 @@ namespace Cascade.Services
             // - Asset accounts (cash, bank, equipment)
             // - Same type accounts (asset to asset, etc.)
             // - Logical business transfers
+
+            if (candidateAccount == null || selectedAccount == null)
+                return false;
 
             if (candidateAccount.Mx9Qw7Type == Mx9Qw7Type.Asset && selectedAccount.Mx9Qw7Type == Mx9Qw7Type.Asset)
                 return true;
@@ -197,7 +315,10 @@ namespace Cascade.Services
 
         private int GetContraAccountPriority(Qw8Rt5Entity account, TransactionDirection direction)
         {
-            var accountNameLower = account.AccountName.ToLower();
+            if (account == null)
+                return 0;
+
+            var accountNameLower = (account.AccountName ?? string.Empty).ToLowerInvariant();
             
             // Priority scoring for contra accounts
             if (accountNameLower == "cash") return 100;
@@ -218,7 +339,10 @@ namespace Cascade.Services
 
         private bool IsRecommendedContraAccount(Qw8Rt5Entity account, TransactionDirection direction)
         {
-            var accountNameLower = account.AccountName.ToLower();
+            if (account == null)
+                return false;
+
+            var accountNameLower = (account.AccountName ?? string.Empty).ToLowerInvariant();
             
             // Cash and bank accounts are always recommended for money transactions
             if (direction == TransactionDirection.MoneyOut || direction == TransactionDirection.MoneyIn)
@@ -240,6 +364,9 @@ namespace Cascade.Services
             Qw8Rt5Entity contraAccount,
             TransactionDirection direction)
         {
+            if (selectedAccount == null || contraAccount == null)
+                throw new ArgumentException("Both selected account and contra account must be provided.");
+
             return direction switch
             {
                 TransactionDirection.MoneyOut => 

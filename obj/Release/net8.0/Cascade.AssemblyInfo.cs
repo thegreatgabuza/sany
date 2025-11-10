@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Cascade")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+72be6809bf3f6526a857ce8811137cd5d1f04a27")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cascade")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cascade")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
